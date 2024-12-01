@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { Room } from "@/types/room";
 import apiClient from "@/api/api";
 
-export const useRoomStore = defineStore("room", {
+export const useRoomStore = defineStore("rooms", {
   state: () => ({
     rooms: [] as Room[],
     loading: false,
