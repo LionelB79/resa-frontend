@@ -112,5 +112,11 @@ export const useRoomStore = defineStore("rooms", {
       );
       this.filterRooms();
     },
+
+    // Méthode pour clear tous les équipements
+    clearEquipments() {
+      this.selectedEquipments = [];
+      this.filterRooms();
+    },
   },
 });
