@@ -8,8 +8,9 @@ export const useRoomStore = defineStore("rooms", {
     loading: false,
     error: null as string | null,
     selectedRoom: null as Room | null,
-    selectedEquipment: null as string | null, // Équipement sélectionné
-    filteredRooms: [] as Room[], // Salles filtrées
+    selectedEquipment: null as string | null,
+    filteredRooms: [] as Room[],
+    selectedCapacity: 5,
   }),
 
   actions: {
@@ -18,12 +19,13 @@ export const useRoomStore = defineStore("rooms", {
       try {
         const response = await apiClient.get<Room[]>("/rooms");
         this.rooms = response.data;
-        console.log("this.rooms", this.rooms);
-        // Initialiser filteredRooms avec toutes les salles dès le chargement
-        this.filteredRooms = this.rooms;
+
+        // Initialiser et filtrer les salles dès le chargement
+        this.filterRooms();
+
         // On sélectionne la première salle par défaut
-        if (this.rooms.length > 0) {
-          this.selectedRoom = this.rooms[0];
+        if (this.filteredRooms.length > 0) {
+          this.selectedRoom = this.filteredRooms[0];
         }
       } catch (error) {
         this.error =
@@ -40,22 +42,38 @@ export const useRoomStore = defineStore("rooms", {
         console.warn("Salle non trouvée :", roomId);
       }
     },
-    // Filtrer les salles par équipement
-    filterRoomsByEquipment(equipmentName: string | null) {
-      // Si aucun équipement n'est sélectionné, on affiche toutes les salles
-      if (!equipmentName) {
-        this.filteredRooms = this.rooms;
-        this.selectedEquipment = null;
-      } else {
-        // Filtrer les salles
-        this.filteredRooms = this.rooms.filter((room) =>
-          room.equipements.some((equip) => equip.name === equipmentName)
+
+    filterRooms() {
+      // Filtrer les salles selon l'équipement et la capacité
+      let filteredRooms = this.rooms;
+
+      // Filtrage par équipement
+      if (this.selectedEquipment) {
+        filteredRooms = filteredRooms.filter((room) =>
+          room.equipements.some(
+            (equip) => equip.name === this.selectedEquipment
+          )
         );
-        this.selectedEquipment = equipmentName;
       }
 
-      // Ne pas modifier la salle sélectionnée
-      // La salle reste sélectionnée même si elle n'est pas dans les salles filtrées
+      // Filtrage par capacité
+      filteredRooms = filteredRooms.filter(
+        (room) => room.capacity >= this.selectedCapacity
+      );
+
+      this.filteredRooms = filteredRooms;
+
+      // Conserver la salle sélectionnée si elle est toujours dans les salles filtrées
+      if (
+        this.selectedRoom &&
+        !this.filteredRooms.some((r) => r.id === this.selectedRoom?.id)
+      ) {
+        this.selectedRoom =
+          this.filteredRooms.length > 0 ? this.filteredRooms[0] : null;
+      }
+    },
+    setSelectedCapacity(capacity: number) {
+      this.selectedCapacity = capacity;
     },
   },
 });

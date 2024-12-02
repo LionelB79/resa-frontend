@@ -20,7 +20,22 @@
           </option>
         </select>
       </div>
-
+      <!-- Filtre de capacité -->
+      <div class="filter-group">
+        <label for="capacity-select">Capacité minimale :</label>
+        <select
+          id="capacity-select"
+          :value="roomStore.selectedCapacity"
+          @change="onCapacityChange($event)"
+          class="select-input"
+        >
+          <option value="5">5+</option>
+          <option value="10">10+</option>
+          <option value="15">15+</option>
+          <option value="20">20+</option>
+          <option value="25">25+</option>
+        </select>
+      </div>
       <!-- Liste des salles filtrées -->
       <div class="filter-group">
         <label for="room-select">Salles disponibles :</label>
@@ -57,6 +72,7 @@ export default {
     onMounted(() => {
       roomStore.fetchRooms();
       equipementStore.fetchEquipments();
+      roomStore.setSelectedCapacity(5);
     });
 
     // Gestion du changement de salle
@@ -70,14 +86,21 @@ export default {
     const onEquipmentChange = (event) => {
       const equipmentName = event.target.value || null;
       equipementStore.selectEquipment(equipmentName);
-      roomStore.filterRoomsByEquipment(equipmentName);
+      roomStore.filterRooms(equipmentName);
     };
 
+    // Gestion du changement de capacité
+    const onCapacityChange = (event) => {
+      const capacity = Number(event.target.value);
+      roomStore.setSelectedCapacity(capacity);
+      roomStore.filterRooms();
+    };
     return {
       roomStore,
       equipementStore,
       onRoomChange,
       onEquipmentChange,
+      onCapacityChange,
     };
   },
 };
