@@ -7,6 +7,7 @@ export const useRoomStore = defineStore("rooms", {
     rooms: [] as Room[],
     loading: false,
     error: null as string | null,
+    selectedRoom: null as Room | null,
   }),
 
   actions: {
@@ -20,6 +21,14 @@ export const useRoomStore = defineStore("rooms", {
           error instanceof Error ? error.message : "Une erreur est survenue";
       } finally {
         this.loading = false;
+      }
+    },
+    selectRoom(roomId: string) {
+      const room = this.rooms.find((r) => r.id === roomId);
+      if (room) {
+        this.selectedRoom = room;
+      } else {
+        console.warn("Salle non trouvée :", roomId);
       }
     },
   },
