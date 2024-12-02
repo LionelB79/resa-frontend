@@ -29,11 +29,13 @@
           @change="onCapacityChange($event)"
           class="select-input"
         >
-          <option value="5">5+</option>
-          <option value="10">10+</option>
-          <option value="15">15+</option>
-          <option value="20">20+</option>
-          <option value="25">25+</option>
+          <option
+            v-for="roomCapacity in roomCapacities"
+            :key="roomCapacity.value"
+            :value="roomCapacity.value"
+          >
+            {{ roomCapacity.label }}
+          </option>
         </select>
       </div>
       <!-- Liste des salles filtrées -->
@@ -58,49 +60,38 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { onMounted } from "vue";
 import { useRoomStore } from "@/stores/roomStore";
+import { ROOM_CAPACITIES } from "@/constants/constants";
 
-export default {
-  name: "RoomControls",
-  setup() {
-    const roomStore = useRoomStore();
+const roomStore = useRoomStore();
+const roomCapacities = ROOM_CAPACITIES;
+onMounted(() => {
+  roomStore.fetchRooms();
+  roomStore.fetchEquipments();
+});
 
-    onMounted(() => {
-      roomStore.fetchRooms();
-      roomStore.fetchEquipments();
-    });
+// Gestion du changement de salle
+const onRoomChange = (event) => {
+  const roomId = event.target.value;
+  roomStore.selectRoom(roomId);
+  console.log("roomId", roomId);
+};
 
-    // Gestion du changement de salle
-    const onRoomChange = (event) => {
-      const roomId = event.target.value;
-      roomStore.selectRoom(roomId);
-      console.log("roomId", roomId);
-    };
+// Gestion du changement d'équipement
+const onEquipmentChange = (event) => {
+  const equipmentName = event.target.value || null;
+  console.log("onEquipmentChange equipmentName", equipmentName);
+  roomStore.selectEquipment(equipmentName);
+  roomStore.filterRooms();
+};
 
-    // Gestion du changement d'équipement
-    const onEquipmentChange = (event) => {
-      const equipmentName = event.target.value || null;
-      console.log("onEquipmentChange equipmentName", equipmentName);
-      roomStore.selectEquipment(equipmentName);
-      roomStore.filterRooms();
-    };
-
-    // Gestion du changement de capacité
-    const onCapacityChange = (event) => {
-      const capacity = Number(event.target.value);
-      roomStore.setSelectedCapacity(capacity);
-      roomStore.filterRooms();
-    };
-
-    return {
-      roomStore,
-      onRoomChange,
-      onEquipmentChange,
-      onCapacityChange,
-    };
-  },
+// Gestion du changement de capacité
+const onCapacityChange = (event) => {
+  const capacity = Number(event.target.value);
+  roomStore.setSelectedCapacity(capacity);
+  roomStore.filterRooms();
 };
 </script>
 
