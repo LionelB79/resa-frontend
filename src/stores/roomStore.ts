@@ -19,6 +19,8 @@ export const useRoomStore = defineStore("rooms", {
         const response = await apiClient.get<Room[]>("/rooms");
         this.rooms = response.data;
         console.log("this.rooms", this.rooms);
+        // Initialiser filteredRooms avec toutes les salles dès le chargement
+        this.filteredRooms = this.rooms;
         // On sélectionne la première salle par défaut
         if (this.rooms.length > 0) {
           this.selectedRoom = this.rooms[0];
@@ -39,11 +41,21 @@ export const useRoomStore = defineStore("rooms", {
       }
     },
     // Filtrer les salles par équipement
-    filterRoomsByEquipment(equipmentName: string) {
-      this.selectedEquipment = equipmentName;
-      this.filteredRooms = this.rooms.filter((room) =>
-        room.equipements.some((equip) => equip.name === equipmentName)
-      );
+    filterRoomsByEquipment(equipmentName: string | null) {
+      // Si aucun équipement n'est sélectionné, on affiche toutes les salles
+      if (!equipmentName) {
+        this.filteredRooms = this.rooms;
+        this.selectedEquipment = null;
+      } else {
+        // Filtrer les salles
+        this.filteredRooms = this.rooms.filter((room) =>
+          room.equipements.some((equip) => equip.name === equipmentName)
+        );
+        this.selectedEquipment = equipmentName;
+      }
+
+      // Ne pas modifier la salle sélectionnée
+      // La salle reste sélectionnée même si elle n'est pas dans les salles filtrées
     },
   },
 });

@@ -10,8 +10,7 @@
           @change="onEquipmentChange($event)"
           class="select-input"
         >
-          <!-- Liste des équipements -->
-          <option value="">Tous les équipements</option>
+          <option value="">Aucun</option>
           <option
             v-for="equipment in equipementStore.equipements"
             :key="equipment.id"
@@ -69,7 +68,7 @@ export default {
 
     // Gestion du changement d'équipement
     const onEquipmentChange = (event) => {
-      const equipmentName = event.target.value;
+      const equipmentName = event.target.value || null;
       equipementStore.selectEquipment(equipmentName);
       roomStore.filterRoomsByEquipment(equipmentName);
     };
