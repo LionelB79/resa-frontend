@@ -28,8 +28,12 @@ export const useEquipementStore = defineStore("equipements", {
     },
 
     // On selectionne un équipement
-    selectEquipment(name: string | null) {
-      this.selectedEquipment = name;
+    selectEquipment(equipmentName: string | null) {
+      console.log("selectEquipment method");
+      console.log("equipmentName :", equipmentName);
+      console.log("avant update:", this.selectedEquipment);
+      this.selectedEquipment = equipmentName;
+      console.log("apres update:", this.selectedEquipment);
     },
   },
 });

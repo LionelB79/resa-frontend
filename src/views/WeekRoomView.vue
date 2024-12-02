@@ -72,7 +72,6 @@ export default {
     onMounted(() => {
       roomStore.fetchRooms();
       equipementStore.fetchEquipments();
-      roomStore.setSelectedCapacity(5);
     });
 
     // Gestion du changement de salle
@@ -85,8 +84,9 @@ export default {
     // Gestion du changement d'équipement
     const onEquipmentChange = (event) => {
       const equipmentName = event.target.value || null;
+      console.log("onEquipmentChange equipmentName", equipmentName);
       equipementStore.selectEquipment(equipmentName);
-      roomStore.filterRooms(equipmentName);
+      roomStore.filterRooms();
     };
 
     // Gestion du changement de capacité

@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { Room } from "@/types/room";
 import apiClient from "@/api/api";
+import { useEquipementStore } from "@/stores/equipementsStore";
 
 export const useRoomStore = defineStore("rooms", {
   state: () => ({
@@ -42,16 +43,17 @@ export const useRoomStore = defineStore("rooms", {
         console.warn("Salle non trouvée :", roomId);
       }
     },
-
+    // Filtrer les salles selon l'équipement et la capacité
     filterRooms() {
-      // Filtrer les salles selon l'équipement et la capacité
+      const equipementStore = useEquipementStore();
       let filteredRooms = this.rooms;
+      console.log("Selected Equipment:", equipementStore.selectedEquipment);
 
       // Filtrage par équipement
-      if (this.selectedEquipment) {
+      if (equipementStore.selectedEquipment) {
         filteredRooms = filteredRooms.filter((room) =>
           room.equipements.some(
-            (equip) => equip.name === this.selectedEquipment
+            (equip) => equip.name === equipementStore.selectedEquipment
           )
         );
       }
@@ -60,10 +62,10 @@ export const useRoomStore = defineStore("rooms", {
       filteredRooms = filteredRooms.filter(
         (room) => room.capacity >= this.selectedCapacity
       );
-
+      console.log("Selected Capacity:", this.selectedCapacity);
       this.filteredRooms = filteredRooms;
 
-      // Conserver la salle sélectionnée si elle est toujours dans les salles filtrées
+      // On conserve la salle sélectionnée si elle est toujours dans les salles filtrées
       if (
         this.selectedRoom &&
         !this.filteredRooms.some((r) => r.id === this.selectedRoom?.id)
