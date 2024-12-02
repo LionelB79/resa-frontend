@@ -12,7 +12,7 @@ export const useRoomStore = defineStore("rooms", {
     selectedRoom: null as Room | null,
     filteredRooms: [] as Room[],
     selectedCapacity: 5,
-    selectedEquipment: null as string | null,
+    selectedEquipments: [] as string[],
     noRoomsFound: false,
   }),
 
@@ -48,13 +48,13 @@ export const useRoomStore = defineStore("rooms", {
     // Filtrer les salles selon l'équipement et la capacité
     filterRooms() {
       let filteredRooms = this.rooms;
-      console.log("Selected Equipment:", this.selectedEquipment);
+      console.log("Selected Equipment:", this.selectedEquipments);
 
       // Filtrage par équipement
-      if (this.selectedEquipment) {
+      if (this.selectedEquipments.length > 0) {
         filteredRooms = filteredRooms.filter((room) =>
-          room.equipements.some(
-            (equip) => equip.name === this.selectedEquipment
+          this.selectedEquipments.every((selectedEquip) =>
+            room.equipements.some((equip) => equip.name === selectedEquip)
           )
         );
       }
@@ -98,13 +98,19 @@ export const useRoomStore = defineStore("rooms", {
       }
     },
 
-    // On selectionne un équipement
-    selectEquipment(equipmentName: string | null) {
-      console.log("selectEquipment method");
-      console.log("equipmentName :", equipmentName);
-      console.log("avant update:", this.selectedEquipment);
-      this.selectedEquipment = equipmentName;
-      console.log("apres update:", this.selectedEquipment);
+    addEquipment(equipmentName: string) {
+      if (!this.selectedEquipments.includes(equipmentName)) {
+        this.selectedEquipments.push(equipmentName);
+        this.filterRooms();
+      }
+    },
+
+    // méthode pour supprimer un équipement
+    removeEquipment(equipmentName: string) {
+      this.selectedEquipments = this.selectedEquipments.filter(
+        (equip) => equip !== equipmentName
+      );
+      this.filterRooms();
     },
   },
 });
