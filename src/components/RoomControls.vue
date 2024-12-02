@@ -1,4 +1,6 @@
-<template></template>
+<template>
+  <div class="room-controls"></div>
+</template>
 
 <script>
 export default {};
