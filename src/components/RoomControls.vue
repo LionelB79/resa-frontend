@@ -1,18 +1,7 @@
-<template>
-
-</template>
+<template></template>
 
 <script>
-
-
-export default {
-    name: "RoomControls",
-    setup() {
-
-        return {
-        };
-    },
-};
+export default {};
 </script>
 
-</style>
+<style></style>

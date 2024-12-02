@@ -1,16 +1,19 @@
 import { defineStore } from "pinia";
 import { Room } from "@/types/room";
 import apiClient from "@/api/api";
-import { useEquipementStore } from "@/stores/equipementsStore";
+import { Equipements } from "@/types/equipements";
 
 export const useRoomStore = defineStore("rooms", {
   state: () => ({
     rooms: [] as Room[],
+    equipements: [] as Equipements[],
     loading: false,
     error: null as string | null,
     selectedRoom: null as Room | null,
     filteredRooms: [] as Room[],
     selectedCapacity: 5,
+
+    selectedEquipment: null as string | null, // Équipement sélectionné
   }),
 
   actions: {
@@ -44,15 +47,14 @@ export const useRoomStore = defineStore("rooms", {
     },
     // Filtrer les salles selon l'équipement et la capacité
     filterRooms() {
-      const equipementStore = useEquipementStore();
       let filteredRooms = this.rooms;
-      console.log("Selected Equipment:", equipementStore.selectedEquipment);
+      console.log("Selected Equipment:", this.selectedEquipment);
 
       // Filtrage par équipement
-      if (equipementStore.selectedEquipment) {
+      if (this.selectedEquipment) {
         filteredRooms = filteredRooms.filter((room) =>
           room.equipements.some(
-            (equip) => equip.name === equipementStore.selectedEquipment
+            (equip) => equip.name === this.selectedEquipment
           )
         );
       }
@@ -75,6 +77,30 @@ export const useRoomStore = defineStore("rooms", {
     },
     setSelectedCapacity(capacity: number) {
       this.selectedCapacity = capacity;
+    },
+    // On récupere tous les équipements
+    async fetchEquipments() {
+      this.loading = true;
+      try {
+        const response = await apiClient.get<Equipements[]>("/equipements");
+        this.equipements = response.data;
+      } catch (error) {
+        this.error =
+          error instanceof Error
+            ? error.message
+            : "Erreur lors du chargement des équipements";
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    // On selectionne un équipement
+    selectEquipment(equipmentName: string | null) {
+      console.log("selectEquipment method");
+      console.log("equipmentName :", equipmentName);
+      console.log("avant update:", this.selectedEquipment);
+      this.selectedEquipment = equipmentName;
+      console.log("apres update:", this.selectedEquipment);
     },
   },
 });

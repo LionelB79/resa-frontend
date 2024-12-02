@@ -6,13 +6,13 @@
         <label for="equipment-select">Équipements :</label>
         <select
           id="equipment-select"
-          :value="equipementStore.selectedEquipment || ''"
+          :value="roomStore.selectedEquipment || ''"
           @change="onEquipmentChange($event)"
           class="select-input"
         >
           <option value="">Aucun</option>
           <option
-            v-for="equipment in equipementStore.equipements"
+            v-for="equipment in roomStore.equipements"
             :key="equipment.id"
             :value="equipment.name"
           >
@@ -61,17 +61,15 @@
 <script>
 import { onMounted } from "vue";
 import { useRoomStore } from "@/stores/roomStore";
-import { useEquipementStore } from "@/stores/equipementsStore";
 
 export default {
   name: "WeekRoomView",
   setup() {
     const roomStore = useRoomStore();
-    const equipementStore = useEquipementStore();
 
     onMounted(() => {
       roomStore.fetchRooms();
-      equipementStore.fetchEquipments();
+      roomStore.fetchEquipments();
     });
 
     // Gestion du changement de salle
@@ -85,7 +83,7 @@ export default {
     const onEquipmentChange = (event) => {
       const equipmentName = event.target.value || null;
       console.log("onEquipmentChange equipmentName", equipmentName);
-      equipementStore.selectEquipment(equipmentName);
+      roomStore.selectEquipment(equipmentName);
       roomStore.filterRooms();
     };
 
@@ -97,7 +95,6 @@ export default {
     };
     return {
       roomStore,
-      equipementStore,
       onRoomChange,
       onEquipmentChange,
       onCapacityChange,
