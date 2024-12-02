@@ -9,7 +9,6 @@ export const useRoomStore = defineStore("rooms", {
     loading: false,
     error: null as string | null,
     selectedRoom: null as Room | null,
-    selectedEquipment: null as string | null,
     filteredRooms: [] as Room[],
     selectedCapacity: 5,
   }),

@@ -64,7 +64,7 @@ import { useRoomStore } from "@/stores/roomStore";
 import { useEquipementStore } from "@/stores/equipementsStore";
 
 export default {
-  name: "RoomDropdown",
+  name: "WeekRoomView",
   setup() {
     const roomStore = useRoomStore();
     const equipementStore = useEquipementStore();
