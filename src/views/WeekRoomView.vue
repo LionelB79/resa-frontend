@@ -1,104 +1,17 @@
 <template>
-  <div class="controls-container">
-    <div class="filters">
-      <!-- Sélection des équipements -->
-      <div class="filter-group">
-        <label for="equipment-select">Équipements :</label>
-        <select
-          id="equipment-select"
-          :value="roomStore.selectedEquipment || ''"
-          @change="onEquipmentChange($event)"
-          class="select-input"
-        >
-          <option value="">Aucun</option>
-          <option
-            v-for="equipment in roomStore.equipements"
-            :key="equipment.id"
-            :value="equipment.name"
-          >
-            {{ equipment.name }}
-          </option>
-        </select>
-      </div>
-      <!-- Filtre de capacité -->
-      <div class="filter-group">
-        <label for="capacity-select">Capacité minimale :</label>
-        <select
-          id="capacity-select"
-          :value="roomStore.selectedCapacity"
-          @change="onCapacityChange($event)"
-          class="select-input"
-        >
-          <option value="5">5+</option>
-          <option value="10">10+</option>
-          <option value="15">15+</option>
-          <option value="20">20+</option>
-          <option value="25">25+</option>
-        </select>
-      </div>
-      <!-- Liste des salles filtrées -->
-      <div class="filter-group">
-        <label for="room-select">Salles disponibles :</label>
-        <select
-          id="room-select"
-          :value="roomStore.selectedRoom?.id || ''"
-          @change="onRoomChange($event)"
-          class="select-input"
-        >
-          <option
-            v-for="room in roomStore.filteredRooms"
-            :key="room.id"
-            :value="room.id"
-          >
-            {{ room.name }}
-          </option>
-        </select>
-      </div>
-    </div>
-  </div>
+  <RoomControls />
 </template>
 
 <script>
-import { onMounted } from "vue";
-import { useRoomStore } from "@/stores/roomStore";
+import RoomControls from "@/components/RoomControls.vue";
 
 export default {
   name: "WeekRoomView",
+  components: {
+    RoomControls,
+  },
   setup() {
-    const roomStore = useRoomStore();
-
-    onMounted(() => {
-      roomStore.fetchRooms();
-      roomStore.fetchEquipments();
-    });
-
-    // Gestion du changement de salle
-    const onRoomChange = (event) => {
-      const roomId = event.target.value;
-      roomStore.selectRoom(roomId);
-      console.log("roomId", roomId);
-    };
-
-    // Gestion du changement d'équipement
-    const onEquipmentChange = (event) => {
-      const equipmentName = event.target.value || null;
-      console.log("onEquipmentChange equipmentName", equipmentName);
-      roomStore.selectEquipment(equipmentName);
-      roomStore.filterRooms();
-    };
-
-    // Gestion du changement de capacité
-    const onCapacityChange = (event) => {
-      const capacity = Number(event.target.value);
-      roomStore.setSelectedCapacity(capacity);
-      roomStore.filterRooms();
-    };
-    return {
-      roomStore,
-      onRoomChange,
-      onEquipmentChange,
-      onCapacityChange,
-    };
+    return {};
   },
 };
 </script>

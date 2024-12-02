@@ -3,7 +3,7 @@ import WeekRoomView from "../views/WeekRoomView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/weekRoomView",
+    path: "/",
     name: "weekRoomView",
     component: WeekRoomView,
   },
