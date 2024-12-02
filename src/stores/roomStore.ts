@@ -16,6 +16,10 @@ export const useRoomStore = defineStore("rooms", {
       try {
         const response = await apiClient.get<Room[]>("/rooms");
         this.rooms = response.data;
+        // On sélectionne la première salle par défaut
+        if (this.rooms.length > 0) {
+          this.selectedRoom = this.rooms[0];
+        }
       } catch (error) {
         this.error =
           error instanceof Error ? error.message : "Une erreur est survenue";

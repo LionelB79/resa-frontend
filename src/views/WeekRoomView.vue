@@ -9,8 +9,6 @@
           @change="onRoomChange($event)"
           class="select-input"
         >
-          <!-- Option par défaut -->
-          <option value="" disabled>Choisissez une salle</option>
           <!-- Liste des salles -->
           <option
             v-for="room in roomStore.rooms"
