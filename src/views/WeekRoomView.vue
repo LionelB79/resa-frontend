@@ -1,6 +1,28 @@
 <template>
   <div class="controls-container">
     <div class="filters">
+      <!-- Sélection des équipements -->
+      <div class="filter-group">
+        <label for="equipment-select">Équipements :</label>
+        <select
+          id="equipment-select"
+          :value="equipementStore.selectedEquipment || ''"
+          @change="onEquipmentChange($event)"
+          class="select-input"
+        >
+          <!-- Liste des équipements -->
+          <option value="">Tous les équipements</option>
+          <option
+            v-for="equipment in equipementStore.equipements"
+            :key="equipment.id"
+            :value="equipment.name"
+          >
+            {{ equipment.name }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Liste des salles filtrées -->
       <div class="filter-group">
         <label for="room-select">Salles disponibles :</label>
         <select
@@ -9,9 +31,8 @@
           @change="onRoomChange($event)"
           class="select-input"
         >
-          <!-- Liste des salles -->
           <option
-            v-for="room in roomStore.rooms"
+            v-for="room in roomStore.filteredRooms"
             :key="room.id"
             :value="room.id"
           >
@@ -26,15 +47,17 @@
 <script>
 import { onMounted } from "vue";
 import { useRoomStore } from "@/stores/roomStore";
+import { useEquipementStore } from "@/stores/equipementsStore";
 
 export default {
   name: "RoomDropdown",
   setup() {
     const roomStore = useRoomStore();
+    const equipementStore = useEquipementStore();
 
-    // Charger les salles au montage du composant
     onMounted(() => {
       roomStore.fetchRooms();
+      equipementStore.fetchEquipments();
     });
 
     // Gestion du changement de salle
@@ -44,9 +67,18 @@ export default {
       console.log("roomId", roomId);
     };
 
+    // Gestion du changement d'équipement
+    const onEquipmentChange = (event) => {
+      const equipmentName = event.target.value;
+      equipementStore.selectEquipment(equipmentName);
+      roomStore.filterRoomsByEquipment(equipmentName);
+    };
+
     return {
       roomStore,
+      equipementStore,
       onRoomChange,
+      onEquipmentChange,
     };
   },
 };

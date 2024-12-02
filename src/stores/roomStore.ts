@@ -8,6 +8,8 @@ export const useRoomStore = defineStore("rooms", {
     loading: false,
     error: null as string | null,
     selectedRoom: null as Room | null,
+    selectedEquipment: null as string | null, // Équipement sélectionné
+    filteredRooms: [] as Room[], // Salles filtrées
   }),
 
   actions: {
@@ -16,6 +18,7 @@ export const useRoomStore = defineStore("rooms", {
       try {
         const response = await apiClient.get<Room[]>("/rooms");
         this.rooms = response.data;
+        console.log("this.rooms", this.rooms);
         // On sélectionne la première salle par défaut
         if (this.rooms.length > 0) {
           this.selectedRoom = this.rooms[0];
@@ -34,6 +37,13 @@ export const useRoomStore = defineStore("rooms", {
       } else {
         console.warn("Salle non trouvée :", roomId);
       }
+    },
+    // Filtrer les salles par équipement
+    filterRoomsByEquipment(equipmentName: string) {
+      this.selectedEquipment = equipmentName;
+      this.filteredRooms = this.rooms.filter((room) =>
+        room.equipements.some((equip) => equip.name === equipmentName)
+      );
     },
   },
 });
