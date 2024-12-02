@@ -42,6 +42,7 @@
       <div class="filter-group">
         <label for="room-select">Salles disponibles :</label>
         <select
+          v-if="!roomStore.noRoomsFound"
           id="room-select"
           :value="roomStore.selectedRoom?.id || ''"
           @change="onRoomChange($event)"
@@ -55,6 +56,9 @@
             {{ room.name }}
           </option>
         </select>
+        <div v-if="roomStore.noRoomsFound" class="no-rooms-message">
+          {{ ROOM_CONTROLS_MESSAGES.NO_ROOMS_FOUND }}
+        </div>
       </div>
     </div>
   </div>
@@ -64,9 +68,11 @@
 import { onMounted } from "vue";
 import { useRoomStore } from "@/stores/roomStore";
 import { ROOM_CAPACITIES } from "@/constants/constants";
+import { ROOM_CONTROLS_MESSAGES } from "@/constants/messages";
 
 const roomStore = useRoomStore();
 const roomCapacities = ROOM_CAPACITIES;
+
 onMounted(() => {
   roomStore.fetchRooms();
   roomStore.fetchEquipments();
@@ -133,5 +139,14 @@ const onCapacityChange = (event) => {
   outline: none;
   border-color: #4f46e5;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.3);
+}
+
+.no-rooms-message {
+  color: #e53e3e;
+  background-color: #fff5f5;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid #fecaca;
+  text-align: center;
 }
 </style>

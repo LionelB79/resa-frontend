@@ -12,8 +12,8 @@ export const useRoomStore = defineStore("rooms", {
     selectedRoom: null as Room | null,
     filteredRooms: [] as Room[],
     selectedCapacity: 5,
-
-    selectedEquipment: null as string | null, // Équipement sélectionné
+    selectedEquipment: null as string | null,
+    noRoomsFound: false,
   }),
 
   actions: {
@@ -64,6 +64,10 @@ export const useRoomStore = defineStore("rooms", {
         (room) => room.capacity >= this.selectedCapacity
       );
       console.log("Selected Capacity:", this.selectedCapacity);
+
+      //On vérifie si la liste de salle est vide apres filtrage
+      this.noRoomsFound = filteredRooms.length === 0;
+
       this.filteredRooms = filteredRooms;
 
       // On conserve la salle sélectionnée si elle est toujours dans les salles filtrées
