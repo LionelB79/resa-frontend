@@ -13,4 +13,9 @@ export const API_ENDPOINTS = {
   EQUIPMENTS: {
     GET_ALL: "/equipements",
   },
+  BOOKINGS: {
+    //TODO endpoints a revoir
+    GET_ALL: "/bookings/all",
+    CREATE: "/bookings",
+  },
 };
