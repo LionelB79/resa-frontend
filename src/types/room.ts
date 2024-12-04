@@ -3,5 +3,5 @@ export interface Room {
   name: string;
   description: string;
   capacity: number;
-  equipements: string[];
+  equipements: { name: string }[];
 }

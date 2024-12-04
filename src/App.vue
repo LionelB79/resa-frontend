@@ -1,7 +1,6 @@
 <template>
   <nav>
-    <router-link to="/">Accueil</router-link> |
-    <router-link to="/weekRoomView">weekRoomView</router-link>
+    <p>weekRoomView</p>
   </nav>
   <router-view />
 </template>
