@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { Room } from "@/types/room";
 import apiClient from "@/api/api";
 import { Equipements } from "@/types/equipements";
+import { API_ENDPOINTS } from "@/constants/api-constants";
 
 export const useRoomStore = defineStore("rooms", {
   state: () => ({
@@ -20,7 +21,9 @@ export const useRoomStore = defineStore("rooms", {
     async fetchRooms() {
       this.loading = true;
       try {
-        const response = await apiClient.get<Room[]>("/rooms");
+        const response = await apiClient.get<Room[]>(
+          API_ENDPOINTS.ROOMS.GET_ALL
+        );
         this.rooms = response.data;
 
         // Initialiser et filtrer les salles dès le chargement
@@ -86,7 +89,9 @@ export const useRoomStore = defineStore("rooms", {
     async fetchEquipments() {
       this.loading = true;
       try {
-        const response = await apiClient.get<Equipements[]>("/equipements");
+        const response = await apiClient.get<Equipements[]>(
+          API_ENDPOINTS.EQUIPMENTS.GET_ALL
+        );
         this.equipements = response.data;
       } catch (error) {
         this.error =

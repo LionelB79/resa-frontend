@@ -1,10 +1,8 @@
 import axios from "axios";
-
+import { API_CONFIG } from "@/constants/api-constants";
 const apiClient = axios.create({
-  baseURL: "http://localhost:3001",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: API_CONFIG.BASE_URL,
+  headers: API_CONFIG.HEADERS,
 });
 
 export default apiClient;
