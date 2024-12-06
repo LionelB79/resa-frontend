@@ -41,7 +41,7 @@ export const useRoomStore = defineStore("rooms", {
       }
     },
     selectRoom(roomId: string) {
-      const room = this.rooms.find((r) => r._id === roomId);
+      const room = this.rooms.find((r) => r.id === roomId);
       if (room) {
         this.selectedRoom = room;
       } else {
@@ -55,7 +55,7 @@ export const useRoomStore = defineStore("rooms", {
       this.filteredRooms = filteredRooms;
 
       // On conserve la salle sélectionnée si elle est toujours dans les salles filtrées
-      if (this.filteredRooms.some((r) => r._id === this.selectedRoom?._id)) {
+      if (this.filteredRooms.some((r) => r.id === this.selectedRoom?.id)) {
         return;
       }
 
