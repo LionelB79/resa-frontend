@@ -85,7 +85,7 @@ const handleSlotClick = (
     timeSlot.minutes
   );
 
-  // Pour l'instant, simple log de la date/heure cliquée
+  //TODO a refaire, pour l'instant, simple log de la date/heure cliquée
   console.log(`Créneau cliqué : ${targetDateTime}`);
   alert(`Créneau : ${format(targetDateTime, "EEEE d MMM HH:mm")}`);
 };
