@@ -90,11 +90,11 @@
 <script setup>
 import { onMounted } from "vue";
 import { useRoomStore } from "@/stores/roomStore";
-import { ROOM_CAPACITIES } from "@/constants/constants";
+import { CONSTANT_ROOM_CAPACITIES } from "@/constants/constants";
 import { ROOM_CONTROLS_MESSAGES } from "@/constants/messages";
 
 const roomStore = useRoomStore();
-const roomCapacities = ROOM_CAPACITIES;
+const roomCapacities = CONSTANT_ROOM_CAPACITIES;
 
 onMounted(() => {
   roomStore.fetchRooms();

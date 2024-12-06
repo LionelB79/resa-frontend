@@ -13,7 +13,7 @@
       <thead>
         <tr>
           <th>Heures</th>
-          <th v-for="(day, index) in daysOfWeek" :key="index">
+          <th v-for="(day, index) in CONSTANT_DAYS_OF_WEEK" :key="index">
             {{ day }}
           </th>
         </tr>
@@ -33,19 +33,13 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { addDays, format } from "date-fns";
+import {
+  CONSTANT_D_MMM_YYYY,
+  CONSTANT_DAYS_OF_WEEK,
+} from "@/constants/constants";
 
 // semaine sélectionnée (reactive)
 const selectedWeek = ref(new Date());
-
-const daysOfWeek = [
-  "Lundi",
-  "Mardi",
-  "Mercredi",
-  "Jeudi",
-  "Vendredi",
-  "Samedi",
-  "Dimanche",
-];
 
 // Génération des créneaux horaires (de 8h à 18h)
 const timeSlots = Array.from({ length: 10 }, (_, i) => i + 8);
@@ -60,8 +54,8 @@ const goToNextWeek = () => {
 
 // Calcul de la plage de dates de la semaine
 const formattedWeekRange = computed(() => {
-  const start = format(selectedWeek.value, "d MMM yyyy");
-  const end = format(addDays(selectedWeek.value, 6), "d MMM yyyy");
+  const start = format(selectedWeek.value, CONSTANT_D_MMM_YYYY);
+  const end = format(addDays(selectedWeek.value, 6), CONSTANT_D_MMM_YYYY);
 
   return `${start} - ${end}`;
 });
