@@ -26,10 +26,10 @@ export const useRoomStore = defineStore("rooms", {
         );
         this.rooms = response.data;
 
-        // Initialiser et filtrer les salles dès le chargement
+        // Filtrer les salles
         this.filterRooms();
 
-        // On sélectionne la première salle par défaut
+        // Sélectionner la première salle disponible
         if (this.filteredRooms.length > 0) {
           this.selectedRoom = this.filteredRooms[0];
         }
@@ -41,51 +41,32 @@ export const useRoomStore = defineStore("rooms", {
       }
     },
     selectRoom(roomId: string) {
-      const room = this.rooms.find((r) => r.id === roomId);
+      const room = this.rooms.find((r) => r._id === roomId);
       if (room) {
         this.selectedRoom = room;
       } else {
         console.warn("Salle non trouvée :", roomId);
       }
     },
-    // Filtrer les salles selon l'équipement et la capacité
+
     filterRooms() {
-      let filteredRooms = this.rooms;
-      console.log("Selected Equipment:", this.selectedEquipments);
-
-      // Filtrage par équipement
-      if (this.selectedEquipments.length > 0) {
-        filteredRooms = filteredRooms.filter((room) =>
-          this.selectedEquipments.every((selectedEquip) =>
-            room.equipements.some((equip) => equip.name === selectedEquip)
-          )
-        );
-      }
-
-      // Filtrage par capacité
-      filteredRooms = filteredRooms.filter(
-        (room) => room.capacity >= this.selectedCapacity
-      );
-      console.log("Selected Capacity:", this.selectedCapacity);
-
-      //On vérifie si la liste de salle est vide apres filtrage
-      this.noRoomsFound = filteredRooms.length === 0;
+      const filteredRooms = this.rooms;
 
       this.filteredRooms = filteredRooms;
 
       // On conserve la salle sélectionnée si elle est toujours dans les salles filtrées
-      if (
-        this.selectedRoom &&
-        !this.filteredRooms.some((r) => r.id === this.selectedRoom?.id)
-      ) {
-        this.selectedRoom =
-          this.filteredRooms.length > 0 ? this.filteredRooms[0] : null;
+      if (this.filteredRooms.some((r) => r._id === this.selectedRoom?._id)) {
+        return;
       }
+
+      // Sinon, sélectionner la première salle filtrée (ou null si aucune salle)
+      this.selectedRoom =
+        this.filteredRooms.length > 0 ? this.filteredRooms[0] : null;
     },
     setSelectedCapacity(capacity: number) {
       this.selectedCapacity = capacity;
     },
-    // On récupere tous les équipements
+
     async fetchEquipments() {
       this.loading = true;
       try {
