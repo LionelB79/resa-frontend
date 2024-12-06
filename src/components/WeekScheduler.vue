@@ -14,7 +14,7 @@
         <tr>
           <th>Heures</th>
           <th v-for="(day, index) in CONSTANT_DAYS_OF_WEEK" :key="index">
-            {{ day }}
+            {{ day }} - {{ formatDayWithMonth(index) }}
           </th>
         </tr>
       </thead>
@@ -38,6 +38,15 @@
         </tr>
       </tbody>
     </table>
+
+    <!--Informations debug -->
+    <div class="debug-info">
+      <h3>Debug Information</h3>
+      <p>Selected Room: {{ roomStore.selectedRoom?._id }}</p>
+      <p>Semaine sélectionnée : {{ selectedWeek }}</p>
+      <p>Plage de semaine : {{ formattedWeekRange }}</p>
+      <pre>Créneaux horaires : {{ JSON.stringify(timeSlots, null, 2) }}</pre>
+    </div>
   </div>
 </template>
 
@@ -48,9 +57,11 @@ import {
   CONSTANT_D_MMM_YYYY,
   CONSTANT_DAYS_OF_WEEK,
 } from "@/constants/constants";
+import { useRoomStore } from "@/stores/roomStore";
 
 // semaine sélectionnée (reactive)
 const selectedWeek = ref(new Date());
+const roomStore = useRoomStore();
 
 // Créneaux horaires détaillés (de 8h à 18h avec séparation de 15 minutes)
 const timeSlots = Array.from({ length: (18 - 8) * 4 }, (_, i) => ({
@@ -64,6 +75,12 @@ const goToPreviousWeek = () => {
 };
 const goToNextWeek = () => {
   selectedWeek.value = addDays(selectedWeek.value, 7);
+};
+
+// Affichage jour num Mois exemple: Lundi-2 Dec
+const formatDayWithMonth = (dayIndex: number) => {
+  const dayDate = addDays(selectedWeek.value, dayIndex);
+  return format(dayDate, "d MMM");
 };
 
 // Calcul de la plage de dates de la semaine
@@ -127,5 +144,13 @@ td {
 
 td:hover {
   background-color: #f0f0f0;
+}
+
+.debug-info {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  overflow-x: auto;
 }
 </style>
