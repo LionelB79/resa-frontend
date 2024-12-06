@@ -21,9 +21,20 @@
 
       <!-- Corps du tableau avec les créneaux horaires -->
       <tbody>
-        <tr v-for="timeSlot in timeSlots" :key="timeSlot">
-          <td>{{ timeSlot }}:00</td>
-          <td v-for="day in 7" :key="day"></td>
+        <tr
+          v-for="timeSlot in timeSlots"
+          :key="timeSlot.hour + timeSlot.minutes"
+        >
+          <td v-if="timeSlot.minutes === 0" class="time-cell" :rowspan="4">
+            {{ timeSlot.hour }}:00
+          </td>
+          <td
+            v-for="dayIndex in 7"
+            :key="dayIndex"
+            @click="handleSlotClick(dayIndex - 1, timeSlot)"
+          >
+            <!-- Espace réservé pour les réservations futures -->
+          </td>
         </tr>
       </tbody>
     </table>
@@ -32,7 +43,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { addDays, format } from "date-fns";
+import { addDays, format, setHours, setMinutes } from "date-fns";
 import {
   CONSTANT_D_MMM_YYYY,
   CONSTANT_DAYS_OF_WEEK,
@@ -41,8 +52,11 @@ import {
 // semaine sélectionnée (reactive)
 const selectedWeek = ref(new Date());
 
-// Génération des créneaux horaires (de 8h à 18h)
-const timeSlots = Array.from({ length: 10 }, (_, i) => i + 8);
+// Créneaux horaires détaillés (de 8h à 18h avec séparation de 15 minutes)
+const timeSlots = Array.from({ length: (18 - 8) * 4 }, (_, i) => ({
+  hour: Math.floor(i / 4) + 8,
+  minutes: (i % 4) * 15,
+}));
 
 // Méthodes pour naviguer entre les semaines
 const goToPreviousWeek = () => {
@@ -59,6 +73,22 @@ const formattedWeekRange = computed(() => {
 
   return `${start} - ${end}`;
 });
+
+// Gestion des clics sur les créneaux
+const handleSlotClick = (
+  dayIndex: number,
+  timeSlot: { hour: number; minutes: number }
+) => {
+  const targetDate = addDays(selectedWeek.value, dayIndex);
+  const targetDateTime = setMinutes(
+    setHours(targetDate, timeSlot.hour),
+    timeSlot.minutes
+  );
+
+  // Pour l'instant, simple log de la date/heure cliquée
+  console.log(`Créneau cliqué : ${targetDateTime}`);
+  alert(`Créneau : ${format(targetDateTime, "EEEE d MMM HH:mm")}`);
+};
 </script>
 
 <style scoped>
@@ -83,5 +113,19 @@ const formattedWeekRange = computed(() => {
   border: 1px solid #ddd;
   text-align: center;
   padding: 5px;
+}
+
+.time-cell {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+td {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+td:hover {
+  background-color: #f0f0f0;
 }
 </style>
