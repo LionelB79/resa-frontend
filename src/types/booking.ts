@@ -1,8 +1,7 @@
 export interface Booking {
-  id?: string;
-  roomId: string;
+  _id: string;
   bookingTitle: string;
+  startTime: string;
+  endTime: string;
   userEmail: string;
-  startTime: Date;
-  endTime: Date;
 }
