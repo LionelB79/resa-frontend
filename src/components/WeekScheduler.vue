@@ -104,9 +104,15 @@ const fetchBookings = async () => {
 // Méthodes pour naviguer entre les semaines
 const goToPreviousWeek = () => {
   selectedWeek.value = addDays(selectedWeek.value, -7);
+  if (roomStore.selectedRoom) {
+    fetchBookings();
+  }
 };
 const goToNextWeek = () => {
   selectedWeek.value = addDays(selectedWeek.value, 7);
+  if (roomStore.selectedRoom) {
+    fetchBookings();
+  }
 };
 
 // Affichage jour num Mois exemple: Lundi-2 Dec
