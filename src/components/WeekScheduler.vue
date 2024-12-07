@@ -87,13 +87,14 @@ import {
   CONSTANT_TIMEZONE_UTC,
 } from "@/constants/constants";
 import { useRoomStore } from "@/stores/roomStore";
-import apiClient from "@/api/api";
+import { useBookingStore } from "@/stores/bookingStore";
 import { Booking } from "@/types/booking";
 import { formatInTimeZone } from "date-fns-tz";
 
 // semaine sélectionnée (reactive), on l'initialise avec les jours correspondant aux date avec startOfWeek
 const selectedWeek = ref(startOfWeek(new Date(), { weekStartsOn: 1 }));
 const roomStore = useRoomStore();
+const bookingStore = useBookingStore();
 // ajout slots pour y attribuer les bookings récupérés pour la semaine
 const slots = ref<Booking[]>([]);
 
@@ -103,44 +104,17 @@ const timeSlots = Array.from({ length: (18 - 8) * 4 }, (_, i) => ({
   minutes: (i % 4) * 15,
 }));
 
-// On récupère les réservations pour la salle et la semaine sélectionnée
-const fetchBookings = async () => {
-  // Log pour déboguer
-  console.log("Salle sélectionnée:", roomStore.selectedRoom);
-
-  // Vérification qu'une room est selectionnée
-  if (!roomStore.selectedRoom) {
-    console.warn("Aucune salle sélectionnée");
-    slots.value = [];
-    return;
-  }
-  console.log("roomStore.selectedRoom", roomStore.selectedRoom);
-  try {
-    const response = await apiClient.get(
-      `/booking/room/${roomStore.selectedRoom._id}/week?weekStart=${format(
-        selectedWeek.value,
-        "yyyy-MM-dd"
-      )}`
-    );
-    // On attribut un booking à un slot
-    slots.value = response.data;
-    console.log("Réservations récupérées:", slots.value);
-  } catch (error) {
-    console.error("Erreur lors de la récupération des réservations", error);
-    slots.value = [];
-  }
-};
 // Méthodes pour naviguer entre les semaines
 const goToPreviousWeek = () => {
   selectedWeek.value = addDays(selectedWeek.value, -7);
   if (roomStore.selectedRoom) {
-    fetchBookings();
+    bookingStore.fetchBookings(selectedWeek.value);
   }
 };
 const goToNextWeek = () => {
   selectedWeek.value = addDays(selectedWeek.value, 7);
   if (roomStore.selectedRoom) {
-    fetchBookings();
+    bookingStore.fetchBookings(selectedWeek.value);
   }
 };
 
@@ -216,7 +190,7 @@ const findBooking = (
     timeSlot.minutes
   );
 
-  return slots.value.find((slot) => {
+  return bookingStore.getSlots.find((slot) => {
     const startTime = parseISO(slot.startTime);
     const endTime = parseISO(slot.endTime);
     const targetTime = parseISO(
@@ -248,7 +222,7 @@ watch(
   () => roomStore.selectedRoom,
   (newRoom) => {
     if (newRoom) {
-      fetchBookings();
+      bookingStore.fetchBookings(selectedWeek.value);
     }
   }
 );
@@ -260,7 +234,7 @@ onMounted(async () => {
   }
 
   if (roomStore.selectedRoom) {
-    fetchBookings();
+    bookingStore.fetchBookings(selectedWeek.value);
   } else {
     console.warn("Aucune salle sélectionnée au montage");
   }
