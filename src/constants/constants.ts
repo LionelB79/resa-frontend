@@ -17,3 +17,5 @@ export const CONSTANT_DAYS_OF_WEEK = [
   "Samedi",
   "Dimanche",
 ];
+
+export const CONSTANT_TIMEZONE_UTC = "UTC";

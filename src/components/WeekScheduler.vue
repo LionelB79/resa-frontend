@@ -21,19 +21,12 @@
 
       <!-- Corps du tableau avec les créneaux horaires -->
       <tbody>
-        <tr
-          v-for="timeSlot in timeSlots"
-          :key="timeSlot.hour + timeSlot.minutes"
-        >
+        <tr v-for="timeSlot in timeSlots" :key="timeSlot.hour + timeSlot.minutes">
           <td v-if="timeSlot.minutes === 0" class="time-cell" :rowspan="4">
             {{ timeSlot.hour }}:00
           </td>
-          <td
-            v-for="dayIndex in 7"
-            :key="dayIndex"
-            :class="getSlotClass(dayIndex - 1, timeSlot)"
-            @click="handleSlotClick(dayIndex - 1, timeSlot)"
-          >
+          <td v-for="dayIndex in 7" :key="dayIndex" :class="getSlotClass(dayIndex - 1, timeSlot)"
+            @click="handleSlotClick(dayIndex - 1, timeSlot)">
             <div v-if="findBooking(dayIndex - 1, timeSlot)">
               <small>{{
                 findBooking(dayIndex - 1, timeSlot)?.bookingTitle
@@ -72,6 +65,7 @@ import {
 import {
   CONSTANT_D_MMM_YYYY,
   CONSTANT_DAYS_OF_WEEK,
+  CONSTANT_TIMEZONE_UTC,
 } from "@/constants/constants";
 import { useRoomStore } from "@/stores/roomStore";
 import apiClient from "@/api/api";
@@ -196,8 +190,8 @@ const formatBookingTime = (booking?: Booking) => {
   if (!booking) return "";
 
   // Conversion en UTC (sinon decalage d'une heure à cause de l'environnement local en utc +1)
-  const startTime = formatInTimeZone(booking.startTime, "UTC", "HH:mm");
-  const endTime = formatInTimeZone(booking.endTime, "UTC", "HH:mm");
+  const startTime = formatInTimeZone(booking.startTime, CONSTANT_TIMEZONE_UTC, "HH:mm");
+  const endTime = formatInTimeZone(booking.endTime, CONSTANT_TIMEZONE_UTC, "HH:mm");
   return `${startTime} - ${endTime}`;
 };
 
