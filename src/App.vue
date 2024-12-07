@@ -1,7 +1,5 @@
 <template>
-  <nav>
-    <p>weekRoomView</p>
-  </nav>
+  <p>weekRoomView</p>
   <router-view />
 </template>
 

@@ -21,12 +21,19 @@
 
       <!-- Corps du tableau avec les créneaux horaires -->
       <tbody>
-        <tr v-for="timeSlot in timeSlots" :key="timeSlot.hour + timeSlot.minutes">
+        <tr
+          v-for="timeSlot in timeSlots"
+          :key="timeSlot.hour + timeSlot.minutes"
+        >
           <td v-if="timeSlot.minutes === 0" class="time-cell" :rowspan="4">
             {{ timeSlot.hour }}:00
           </td>
-          <td v-for="dayIndex in 7" :key="dayIndex" :class="getSlotClass(dayIndex - 1, timeSlot)"
-            @click="handleSlotClick(dayIndex - 1, timeSlot)">
+          <td
+            v-for="dayIndex in 7"
+            :key="dayIndex"
+            :class="getSlotClass(dayIndex - 1, timeSlot)"
+            @click="handleSlotClick(dayIndex - 1, timeSlot)"
+          >
             <div v-if="findBooking(dayIndex - 1, timeSlot)">
               <small>{{
                 findBooking(dayIndex - 1, timeSlot)?.bookingTitle
@@ -190,8 +197,16 @@ const formatBookingTime = (booking?: Booking) => {
   if (!booking) return "";
 
   // Conversion en UTC (sinon decalage d'une heure à cause de l'environnement local en utc +1)
-  const startTime = formatInTimeZone(booking.startTime, CONSTANT_TIMEZONE_UTC, "HH:mm");
-  const endTime = formatInTimeZone(booking.endTime, CONSTANT_TIMEZONE_UTC, "HH:mm");
+  const startTime = formatInTimeZone(
+    booking.startTime,
+    CONSTANT_TIMEZONE_UTC,
+    "HH:mm"
+  );
+  const endTime = formatInTimeZone(
+    booking.endTime,
+    CONSTANT_TIMEZONE_UTC,
+    "HH:mm"
+  );
   return `${startTime} - ${endTime}`;
 };
 
@@ -247,12 +262,16 @@ onMounted(async () => {
 .week-table td {
   border: 1px solid #ddd;
   text-align: center;
-  padding: 5px;
+  font-size: 0.8em;
 }
 
-.time-cell {
-  background-color: #f5f5f5;
-  font-weight: bold;
+.week-table th:nth-child(n + 2),
+.week-table td:nth-child(n + 2) {
+  width: 235px;
+}
+
+.week-table tbody tr {
+  height: 20px;
 }
 
 td {
