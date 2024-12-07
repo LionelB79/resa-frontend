@@ -41,7 +41,7 @@ export const useRoomStore = defineStore("rooms", {
       }
     },
     selectRoom(roomId: string) {
-      const room = this.rooms.find((r) => r.id === roomId);
+      const room = this.rooms.find((r) => r._id === roomId);
       if (room) {
         this.selectedRoom = room;
       } else {
@@ -50,18 +50,32 @@ export const useRoomStore = defineStore("rooms", {
     },
 
     filterRooms() {
-      const filteredRooms = this.rooms;
-
-      this.filteredRooms = filteredRooms;
-
-      // On conserve la salle sélectionnée si elle est toujours dans les salles filtrées
-      if (this.filteredRooms.some((r) => r.id === this.selectedRoom?.id)) {
-        return;
+      let filteredRooms = this.rooms;
+      console.log("Selected Equipment:", this.selectedEquipments);
+      // Filtrage par équipement
+      if (this.selectedEquipments.length > 0) {
+        filteredRooms = filteredRooms.filter((room) =>
+          this.selectedEquipments.every((selectedEquip) =>
+            room.equipements.some((equip) => equip.name === selectedEquip)
+          )
+        );
       }
-
-      // Sinon, sélectionner la première salle filtrée (ou null si aucune salle)
-      this.selectedRoom =
-        this.filteredRooms.length > 0 ? this.filteredRooms[0] : null;
+      // Filtrage par capacité
+      filteredRooms = filteredRooms.filter(
+        (room) => room.capacity >= this.selectedCapacity
+      );
+      console.log("Selected Capacity:", this.selectedCapacity);
+      //On vérifie si la liste de salle est vide apres filtrage
+      this.noRoomsFound = filteredRooms.length === 0;
+      this.filteredRooms = filteredRooms;
+      // On conserve la salle sélectionnée si elle est toujours dans les salles filtrées
+      if (
+        this.selectedRoom &&
+        !this.filteredRooms.some((r) => r._id === this.selectedRoom?._id)
+      ) {
+        this.selectedRoom =
+          this.filteredRooms.length > 0 ? this.filteredRooms[0] : null;
+      }
     },
     setSelectedCapacity(capacity: number) {
       this.selectedCapacity = capacity;

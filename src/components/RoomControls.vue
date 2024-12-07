@@ -67,14 +67,14 @@
         <select
           v-if="!roomStore.noRoomsFound"
           id="room-select"
-          :value="roomStore.selectedRoom?.id || ''"
+          :value="roomStore.selectedRoom?._id || ''"
           @change="onRoomChange($event)"
           class="select-input"
         >
           <option
             v-for="room in roomStore.filteredRooms"
-            :key="room.id"
-            :value="room.id"
+            :key="room._id"
+            :value="room._id"
           >
             {{ room.name }}
           </option>
