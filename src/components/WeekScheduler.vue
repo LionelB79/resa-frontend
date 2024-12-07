@@ -188,7 +188,7 @@ const formatBookingTime = (booking?: Booking) => {
   const startTime = parseISO(booking.startTime);
   const endTime = parseISO(booking.endTime);
 
-  return `${startTime} - ${endTime}`;
+  return `${format(startTime, "HH:mm")}-${format(endTime, "HH:mm")}`;
 };
 
 // Observateur pour charger les réservations quand la salle change
