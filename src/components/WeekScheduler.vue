@@ -31,6 +31,7 @@
           <td
             v-for="dayIndex in 7"
             :key="dayIndex"
+            :class="getSlotClass(dayIndex - 1, timeSlot)"
             @click="handleSlotClick(dayIndex - 1, timeSlot)"
           ></td>
         </tr>
@@ -140,6 +141,19 @@ const handleSlotClick = (
   }
 };
 
+const getSlotClass = (
+  dayIndex: number,
+  timeSlot: { hour: number; minutes: number }
+) => {
+  const booking = findBooking(dayIndex, timeSlot);
+  if (booking) {
+    return {
+      reserved: true,
+    };
+  }
+  return { available: true };
+};
+
 const findBooking = (
   dayIndex: number,
   timeSlot: { hour: number; minutes: number }
@@ -235,5 +249,15 @@ td:hover {
   background-color: #f0f0f0;
   border: 1px solid #ddd;
   overflow-x: auto;
+}
+
+.available {
+  background-color: #e6f7ff;
+  cursor: pointer;
+}
+
+.reserved {
+  background-color: #ff4d4f;
+  color: red;
 }
 </style>
