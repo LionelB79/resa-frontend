@@ -337,6 +337,7 @@ td:hover {
 .booking-first-slot {
   background-color: #ff4d4f;
   color: white;
+  border-top: 2px solid black;
 }
 
 .booking-continuation {
