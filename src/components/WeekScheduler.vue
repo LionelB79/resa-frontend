@@ -32,9 +32,7 @@
             v-for="dayIndex in 7"
             :key="dayIndex"
             @click="handleSlotClick(dayIndex - 1, timeSlot)"
-          >
-            <!-- Espace réservé pour les réservations futures -->
-          </td>
+          ></td>
         </tr>
       </tbody>
     </table>
@@ -53,7 +51,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from "vue";
-import { addDays, format, setHours, setMinutes } from "date-fns";
+import { addDays, format, parseISO, setHours, setMinutes } from "date-fns";
 import {
   CONSTANT_D_MMM_YYYY,
   CONSTANT_DAYS_OF_WEEK,
@@ -134,14 +132,32 @@ const handleSlotClick = (
   dayIndex: number,
   timeSlot: { hour: number; minutes: number }
 ) => {
+  const booking = findBooking(dayIndex, timeSlot);
+  if (booking) {
+    alert(`Réservation existante : ${booking.bookingTitle}`);
+  } else {
+    alert(`Créneau disponible : ${timeSlot.hour}:${timeSlot.minutes}`);
+  }
+};
+
+const findBooking = (
+  dayIndex: number,
+  timeSlot: { hour: number; minutes: number }
+): Booking | undefined => {
   const targetDate = addDays(selectedWeek.value, dayIndex);
   const targetDateTime = setMinutes(
     setHours(targetDate, timeSlot.hour),
     timeSlot.minutes
   );
 
-  console.log(`Créneau cliqué : ${targetDateTime}`);
-  alert(`Créneau : ${format(targetDateTime, "EEEE d MMM HH:mm")}`);
+  return slots.value.find((slot) => {
+    const startTime = parseISO(slot.startTime);
+    const endTime = parseISO(slot.endTime);
+    const targetTime = parseISO(
+      format(targetDateTime, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    );
+    return targetTime >= startTime && targetTime < endTime;
+  });
 };
 
 // Observateur pour charger les réservations quand la salle change
