@@ -76,6 +76,7 @@ import {
 import { useRoomStore } from "@/stores/roomStore";
 import apiClient from "@/api/api";
 import { Booking } from "@/types/booking";
+import { formatInTimeZone } from "date-fns-tz";
 
 // semaine sélectionnée (reactive), on l'initialise avec les jours correspondant aux date avec startOfWeek
 const selectedWeek = ref(startOfWeek(new Date(), { weekStartsOn: 1 }));
@@ -193,10 +194,11 @@ const findBooking = (
 //on affiche l'heure de la reservation
 const formatBookingTime = (booking?: Booking) => {
   if (!booking) return "";
-  const startTime = parseISO(booking.startTime);
-  const endTime = parseISO(booking.endTime);
 
-  return `${format(startTime, "HH:mm")}-${format(endTime, "HH:mm")}`;
+  // Conversion en UTC (sinon decalage d'une heure à cause de l'environnement local en utc +1)
+  const startTime = formatInTimeZone(booking.startTime, "UTC", "HH:mm");
+  const endTime = formatInTimeZone(booking.endTime, "UTC", "HH:mm");
+  return `${startTime} - ${endTime}`;
 };
 
 // Observateur pour charger les réservations quand la salle change
