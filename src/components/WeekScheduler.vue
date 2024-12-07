@@ -33,7 +33,16 @@
             :key="dayIndex"
             :class="getSlotClass(dayIndex - 1, timeSlot)"
             @click="handleSlotClick(dayIndex - 1, timeSlot)"
-          ></td>
+          >
+            <div v-if="findBooking(dayIndex - 1, timeSlot)">
+              <small>{{
+                findBooking(dayIndex - 1, timeSlot)?.bookingTitle
+              }}</small>
+              <small>{{
+                formatBookingTime(findBooking(dayIndex - 1, timeSlot))
+              }}</small>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -172,6 +181,14 @@ const findBooking = (
     );
     return targetTime >= startTime && targetTime < endTime;
   });
+};
+//on affiche l'heure de la reservation
+const formatBookingTime = (booking?: Booking) => {
+  if (!booking) return "";
+  const startTime = parseISO(booking.startTime);
+  const endTime = parseISO(booking.endTime);
+
+  return `${startTime} - ${endTime}`;
 };
 
 // Observateur pour charger les réservations quand la salle change
