@@ -34,13 +34,25 @@
             :class="getSlotClass(dayIndex - 1, timeSlot)"
             @click="handleSlotClick(dayIndex - 1, timeSlot)"
           >
-            <div v-if="findBooking(dayIndex - 1, timeSlot)">
-              <small>{{
-                findBooking(dayIndex - 1, timeSlot)?.bookingTitle
-              }}</small>
-              <small>{{
-                formatBookingTime(findBooking(dayIndex - 1, timeSlot))
-              }}</small>
+            <div
+              v-if="findBooking(dayIndex - 1, timeSlot)"
+              :class="{
+                'booking-first-slot': isFirstSlotOfBooking(
+                  dayIndex - 1,
+                  timeSlot
+                ),
+                'booking-continuation': !isFirstSlotOfBooking(
+                  dayIndex - 1,
+                  timeSlot
+                ),
+              }"
+            >
+              <small v-if="isFirstSlotOfBooking(dayIndex - 1, timeSlot)">
+                {{ findBooking(dayIndex - 1, timeSlot)?.bookingTitle }}
+              </small>
+              <small v-if="isFirstSlotOfBooking(dayIndex - 1, timeSlot)">
+                {{ formatBookingTime(findBooking(dayIndex - 1, timeSlot)) }}
+              </small>
             </div>
           </td>
         </tr>
@@ -159,7 +171,28 @@ const handleSlotClick = (
     alert(`Créneau disponible : ${timeSlot.hour}:${timeSlot.minutes}`);
   }
 };
+const isFirstSlotOfBooking = (
+  dayIndex: number,
+  timeSlot: { hour: number; minutes: number }
+): boolean => {
+  const booking = findBooking(dayIndex, timeSlot);
+  if (!booking) return false;
 
+  const startHour = formatInTimeZone(
+    parseISO(booking.startTime),
+    CONSTANT_TIMEZONE_UTC,
+    "HH"
+  );
+  const startMinutes = formatInTimeZone(
+    parseISO(booking.startTime),
+    CONSTANT_TIMEZONE_UTC,
+    "mm"
+  );
+  return (
+    parseInt(startHour) === timeSlot.hour &&
+    parseInt(startMinutes) === timeSlot.minutes
+  );
+};
 const getSlotClass = (
   dayIndex: number,
   timeSlot: { hour: number; minutes: number }
@@ -299,5 +332,20 @@ td:hover {
 .reserved {
   background-color: #ff4d4f;
   color: red;
+}
+
+.booking-first-slot {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.booking-continuation {
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+}
+
+.week-table td.reserved {
+  border: none;
 }
 </style>
