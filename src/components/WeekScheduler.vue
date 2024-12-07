@@ -61,7 +61,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from "vue";
-import { addDays, format, parseISO, setHours, setMinutes } from "date-fns";
+import {
+  addDays,
+  format,
+  parseISO,
+  setHours,
+  setMinutes,
+  startOfWeek,
+} from "date-fns";
 import {
   CONSTANT_D_MMM_YYYY,
   CONSTANT_DAYS_OF_WEEK,
@@ -70,8 +77,8 @@ import { useRoomStore } from "@/stores/roomStore";
 import apiClient from "@/api/api";
 import { Booking } from "@/types/booking";
 
-// semaine sélectionnée (reactive)
-const selectedWeek = ref(new Date());
+// semaine sélectionnée (reactive), on l'initialise avec les jours correspondant aux date avec startOfWeek
+const selectedWeek = ref(startOfWeek(new Date(), { weekStartsOn: 1 }));
 const roomStore = useRoomStore();
 // ajout slots pour y attribuer les bookings récupérés pour la semaine
 const slots = ref<Booking[]>([]);
@@ -126,6 +133,7 @@ const goToNextWeek = () => {
 // Affichage jour num Mois exemple: Lundi-2 Dec
 const formatDayWithMonth = (dayIndex: number) => {
   const dayDate = addDays(selectedWeek.value, dayIndex);
+  console.log("dayDate", dayDate);
   return format(dayDate, "d MMM");
 };
 
