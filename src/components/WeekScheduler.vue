@@ -64,16 +64,6 @@
                   bookingStore.findBooking(selectedWeek, dayIndex - 1, timeSlot)
                     ?.bookingTitle
                 }}
-              </small>
-              <small
-                v-if="
-                  bookingStore.isFirstSlotOfBooking(
-                    selectedWeek,
-                    dayIndex - 1,
-                    timeSlot
-                  )
-                "
-              >
                 {{
                   bookingStore.formatBookingTime(
                     bookingStore.findBooking(
