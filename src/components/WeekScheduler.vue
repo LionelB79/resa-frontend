@@ -35,7 +35,9 @@
             @click="handleSlotClick(dayIndex - 1, timeSlot)"
           >
             <div
-              v-if="findBooking(dayIndex - 1, timeSlot)"
+              v-if="
+                bookingStore.findBooking(selectedWeek, dayIndex - 1, timeSlot)
+              "
               :class="{
                 'booking-first-slot': isFirstSlotOfBooking(
                   dayIndex - 1,
@@ -48,10 +50,21 @@
               }"
             >
               <small v-if="isFirstSlotOfBooking(dayIndex - 1, timeSlot)">
-                {{ findBooking(dayIndex - 1, timeSlot)?.bookingTitle }}
+                {{
+                  bookingStore.findBooking(selectedWeek, dayIndex - 1, timeSlot)
+                    ?.bookingTitle
+                }}
               </small>
               <small v-if="isFirstSlotOfBooking(dayIndex - 1, timeSlot)">
-                {{ formatBookingTime(findBooking(dayIndex - 1, timeSlot)) }}
+                {{
+                  formatBookingTime(
+                    bookingStore.findBooking(
+                      selectedWeek,
+                      dayIndex - 1,
+                      timeSlot
+                    )
+                  )
+                }}
               </small>
             </div>
           </td>
@@ -73,14 +86,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from "vue";
-import {
-  addDays,
-  format,
-  parseISO,
-  setHours,
-  setMinutes,
-  startOfWeek,
-} from "date-fns";
+import { addDays, format, parseISO, startOfWeek } from "date-fns";
 import {
   CONSTANT_D_MMM_YYYY,
   CONSTANT_DAYS_OF_WEEK,
@@ -138,7 +144,11 @@ const handleSlotClick = (
   dayIndex: number,
   timeSlot: { hour: number; minutes: number }
 ) => {
-  const booking = findBooking(dayIndex, timeSlot);
+  const booking = bookingStore.findBooking(
+    selectedWeek.value,
+    dayIndex,
+    timeSlot
+  );
   if (booking) {
     alert(`Réservation existante : ${booking.bookingTitle}`);
   } else {
@@ -149,7 +159,11 @@ const isFirstSlotOfBooking = (
   dayIndex: number,
   timeSlot: { hour: number; minutes: number }
 ): boolean => {
-  const booking = findBooking(dayIndex, timeSlot);
+  const booking = bookingStore.findBooking(
+    selectedWeek.value,
+    dayIndex,
+    timeSlot
+  );
   if (!booking) return false;
 
   const startHour = formatInTimeZone(
@@ -171,7 +185,11 @@ const getSlotClass = (
   dayIndex: number,
   timeSlot: { hour: number; minutes: number }
 ) => {
-  const booking = findBooking(dayIndex, timeSlot);
+  const booking = bookingStore.findBooking(
+    selectedWeek.value,
+    dayIndex,
+    timeSlot
+  );
   if (booking) {
     return {
       reserved: true,
@@ -180,25 +198,6 @@ const getSlotClass = (
   return { available: true };
 };
 
-const findBooking = (
-  dayIndex: number,
-  timeSlot: { hour: number; minutes: number }
-): Booking | undefined => {
-  const targetDate = addDays(selectedWeek.value, dayIndex);
-  const targetDateTime = setMinutes(
-    setHours(targetDate, timeSlot.hour),
-    timeSlot.minutes
-  );
-
-  return bookingStore.getSlots.find((slot) => {
-    const startTime = parseISO(slot.startTime);
-    const endTime = parseISO(slot.endTime);
-    const targetTime = parseISO(
-      format(targetDateTime, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    );
-    return targetTime >= startTime && targetTime < endTime;
-  });
-};
 //on affiche l'heure de la reservation
 const formatBookingTime = (booking?: Booking) => {
   if (!booking) return "";
