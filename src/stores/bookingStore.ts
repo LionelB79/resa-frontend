@@ -1,19 +1,30 @@
 import { defineStore } from "pinia";
 import apiClient from "@/api/api";
 import { Booking } from "@/types/booking";
-import { format, parseISO, setHours, setMinutes } from "date-fns";
+import {
+  addDays,
+  format,
+  parseISO,
+  setHours,
+  setMinutes,
+  startOfWeek,
+} from "date-fns";
 import { useRoomStore } from "@/stores/roomStore";
 import { API_ENDPOINTS } from "@/constants/api-constants";
 import { formatInTimeZone } from "date-fns-tz";
-import { CONSTANT_TIMEZONE_UTC } from "@/constants/constants";
+import {
+  CONSTANT_D_MMM_YYYY,
+  CONSTANT_TIMEZONE_UTC,
+} from "@/constants/constants";
 
 export const useBookingStore = defineStore("bookings", {
   state: () => ({
     slots: [] as Booking[],
+    selectedWeek: startOfWeek(new Date(), { weekStartsOn: 1 }),
   }),
 
   actions: {
-    async fetchBookings(selectedWeek: Date) {
+    async fetchBookings() {
       const roomStore = useRoomStore();
 
       // Vérification qu'une room est selectionnée
@@ -26,7 +37,7 @@ export const useBookingStore = defineStore("bookings", {
       try {
         const url = API_ENDPOINTS.BOOKINGS.GET_ROOM_BOOKINGS_FOR_WEEK(
           roomStore.selectedRoom._id,
-          format(selectedWeek, "yyyy-MM-dd")
+          format(this.selectedWeek, "yyyy-MM-dd")
         );
         const response = await apiClient.get(url);
 
@@ -39,12 +50,11 @@ export const useBookingStore = defineStore("bookings", {
       }
     },
     findBooking(
-      selectedWeek: Date,
       dayIndex: number,
       timeSlot: { hour: number; minutes: number }
     ): Booking | undefined {
       // On créé une date pour le jour spécifique de la semaine sélectionnée
-      const targetDate = new Date(selectedWeek);
+      const targetDate = new Date(this.selectedWeek);
       targetDate.setDate(targetDate.getDate() + dayIndex);
 
       // On contruit la date et l'heure exactes du créneau à vérifier
@@ -66,12 +76,11 @@ export const useBookingStore = defineStore("bookings", {
       });
     },
     isFirstSlotOfBooking(
-      selectedWeek: Date,
       dayIndex: number,
       timeSlot: { hour: number; minutes: number }
     ): boolean {
       // On prend la réservation correspondant au créneau horaire et au jour donnés
-      const booking = this.findBooking(selectedWeek, dayIndex, timeSlot);
+      const booking = this.findBooking(dayIndex, timeSlot);
       if (!booking) return false;
 
       // On récupère l'heure de début de la réservation en UTC et la formate en heures
@@ -110,6 +119,29 @@ export const useBookingStore = defineStore("bookings", {
       );
 
       return `${startTime} - ${endTime}`;
+    },
+    goToPreviousWeek() {
+      this.selectedWeek = addDays(this.selectedWeek, -7);
+      this.fetchBookings();
+    },
+
+    goToNextWeek() {
+      this.selectedWeek = addDays(this.selectedWeek, 7);
+      this.fetchBookings();
+    },
+    // Affichage jour num Mois exemple: Lundi-2 Dec
+
+    formatDayWithMonth(dayIndex: number): string {
+      const dayDate = addDays(this.selectedWeek, dayIndex);
+      return format(dayDate, "d MMM");
+    },
+    // Calcul de la plage de dates de la semaine
+
+    getFormattedWeekRange(): string {
+      const start = format(this.selectedWeek, CONSTANT_D_MMM_YYYY);
+      const end = format(addDays(this.selectedWeek, 6), CONSTANT_D_MMM_YYYY);
+
+      return `${start} - ${end}`;
     },
   },
 
