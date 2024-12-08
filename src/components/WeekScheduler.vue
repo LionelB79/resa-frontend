@@ -39,25 +39,43 @@
                 bookingStore.findBooking(selectedWeek, dayIndex - 1, timeSlot)
               "
               :class="{
-                'booking-first-slot': isFirstSlotOfBooking(
+                'booking-first-slot': bookingStore.isFirstSlotOfBooking(
+                  selectedWeek,
                   dayIndex - 1,
                   timeSlot
                 ),
-                'booking-continuation': !isFirstSlotOfBooking(
+                'booking-continuation': !bookingStore.isFirstSlotOfBooking(
+                  selectedWeek,
                   dayIndex - 1,
                   timeSlot
                 ),
               }"
             >
-              <small v-if="isFirstSlotOfBooking(dayIndex - 1, timeSlot)">
+              <small
+                v-if="
+                  bookingStore.isFirstSlotOfBooking(
+                    selectedWeek,
+                    dayIndex - 1,
+                    timeSlot
+                  )
+                "
+              >
                 {{
                   bookingStore.findBooking(selectedWeek, dayIndex - 1, timeSlot)
                     ?.bookingTitle
                 }}
               </small>
-              <small v-if="isFirstSlotOfBooking(dayIndex - 1, timeSlot)">
+              <small
+                v-if="
+                  bookingStore.isFirstSlotOfBooking(
+                    selectedWeek,
+                    dayIndex - 1,
+                    timeSlot
+                  )
+                "
+              >
                 {{
-                  formatBookingTime(
+                  bookingStore.formatBookingTime(
                     bookingStore.findBooking(
                       selectedWeek,
                       dayIndex - 1,
@@ -86,16 +104,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from "vue";
-import { addDays, format, parseISO, startOfWeek } from "date-fns";
+import { addDays, format, startOfWeek } from "date-fns";
 import {
   CONSTANT_D_MMM_YYYY,
   CONSTANT_DAYS_OF_WEEK,
-  CONSTANT_TIMEZONE_UTC,
 } from "@/constants/constants";
 import { useRoomStore } from "@/stores/roomStore";
 import { useBookingStore } from "@/stores/bookingStore";
 import { Booking } from "@/types/booking";
-import { formatInTimeZone } from "date-fns-tz";
 
 // semaine sélectionnée (reactive), on l'initialise avec les jours correspondant aux date avec startOfWeek
 const selectedWeek = ref(startOfWeek(new Date(), { weekStartsOn: 1 }));
@@ -155,32 +171,7 @@ const handleSlotClick = (
     alert(`Créneau disponible : ${timeSlot.hour}:${timeSlot.minutes}`);
   }
 };
-const isFirstSlotOfBooking = (
-  dayIndex: number,
-  timeSlot: { hour: number; minutes: number }
-): boolean => {
-  const booking = bookingStore.findBooking(
-    selectedWeek.value,
-    dayIndex,
-    timeSlot
-  );
-  if (!booking) return false;
 
-  const startHour = formatInTimeZone(
-    parseISO(booking.startTime),
-    CONSTANT_TIMEZONE_UTC,
-    "HH"
-  );
-  const startMinutes = formatInTimeZone(
-    parseISO(booking.startTime),
-    CONSTANT_TIMEZONE_UTC,
-    "mm"
-  );
-  return (
-    parseInt(startHour) === timeSlot.hour &&
-    parseInt(startMinutes) === timeSlot.minutes
-  );
-};
 const getSlotClass = (
   dayIndex: number,
   timeSlot: { hour: number; minutes: number }
@@ -196,24 +187,6 @@ const getSlotClass = (
     };
   }
   return { available: true };
-};
-
-//on affiche l'heure de la reservation
-const formatBookingTime = (booking?: Booking) => {
-  if (!booking) return "";
-
-  // Conversion en UTC (sinon decalage d'une heure à cause de l'environnement local en utc +1)
-  const startTime = formatInTimeZone(
-    booking.startTime,
-    CONSTANT_TIMEZONE_UTC,
-    "HH:mm"
-  );
-  const endTime = formatInTimeZone(
-    booking.endTime,
-    CONSTANT_TIMEZONE_UTC,
-    "HH:mm"
-  );
-  return `${startTime} - ${endTime}`;
 };
 
 // Observateur pour charger les réservations quand la salle change

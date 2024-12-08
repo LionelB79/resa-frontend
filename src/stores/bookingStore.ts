@@ -4,6 +4,8 @@ import { Booking } from "@/types/booking";
 import { format, parseISO, setHours, setMinutes } from "date-fns";
 import { useRoomStore } from "@/stores/roomStore";
 import { API_ENDPOINTS } from "@/constants/api-constants";
+import { formatInTimeZone } from "date-fns-tz";
+import { CONSTANT_TIMEZONE_UTC } from "@/constants/constants";
 
 export const useBookingStore = defineStore("bookings", {
   state: () => ({
@@ -62,6 +64,52 @@ export const useBookingStore = defineStore("bookings", {
         //On met < endTime et pas <= pour ne pas englober le slot de 15min suivant
         return targetTime >= startTime && targetTime < endTime;
       });
+    },
+    isFirstSlotOfBooking(
+      selectedWeek: Date,
+      dayIndex: number,
+      timeSlot: { hour: number; minutes: number }
+    ): boolean {
+      // On prend la réservation correspondant au créneau horaire et au jour donnés
+      const booking = this.findBooking(selectedWeek, dayIndex, timeSlot);
+      if (!booking) return false;
+
+      // On récupère l'heure de début de la réservation en UTC et la formate en heures
+      const startHour = formatInTimeZone(
+        parseISO(booking.startTime),
+        CONSTANT_TIMEZONE_UTC,
+        "HH"
+      );
+      // On récupère les minutes de début de la réservation en UTC
+      const startMinutes = formatInTimeZone(
+        parseISO(booking.startTime),
+        CONSTANT_TIMEZONE_UTC,
+        "mm"
+      );
+
+      // On vérifie si l'heure et les minutes du créneau correspondent exactement à l'heure de début de la réservation
+      return (
+        parseInt(startHour) === timeSlot.hour &&
+        parseInt(startMinutes) === timeSlot.minutes
+      );
+    },
+    //on affiche l'heure de la reservation
+    formatBookingTime(booking?: Booking): string {
+      if (!booking) return "";
+      // Conversion en UTC (sinon decalage d'une heure à cause de l'environnement local en utc +1)
+
+      const startTime = formatInTimeZone(
+        booking.startTime,
+        CONSTANT_TIMEZONE_UTC,
+        "HH:mm"
+      );
+      const endTime = formatInTimeZone(
+        booking.endTime,
+        CONSTANT_TIMEZONE_UTC,
+        "HH:mm"
+      );
+
+      return `${startTime} - ${endTime}`;
     },
   },
 
