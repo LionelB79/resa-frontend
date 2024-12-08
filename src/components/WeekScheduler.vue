@@ -80,6 +80,18 @@
       </tbody>
     </table>
 
+    <!-- Modals -->
+    <CreateBookingModal
+      v-if="showCreateBookingModal"
+      :timeSlot="selectedTimeSlot"
+      :dayIndex="selectedDayIndex"
+      @close="showCreateBookingModal = false"
+    />
+    <InfoBookingModal
+      v-if="showInfoBookingModal"
+      :booking="selectedBooking"
+      @close="showInfoBookingModal = false"
+    />
     <!--Informations debug -->
     <div class="debug-info">
       <h3>Debug Information</h3>
@@ -102,7 +114,8 @@ import {
 import { useRoomStore } from "@/stores/roomStore";
 import { useBookingStore } from "@/stores/bookingStore";
 import { Booking } from "@/types/booking";
-
+import CreateBookingModal from "./modals/CreateBookingModal.vue";
+import InfoBookingModal from "./modals/InfoBookingModal.vue";
 // semaine sélectionnée (reactive), on l'initialise avec les jours correspondant aux date avec startOfWeek
 const selectedWeek = ref(startOfWeek(new Date(), { weekStartsOn: 1 }));
 const roomStore = useRoomStore();
@@ -115,6 +128,12 @@ const timeSlots = Array.from({ length: (18 - 8) * 4 }, (_, i) => ({
   hour: Math.floor(i / 4) + 8,
   minutes: (i % 4) * 15,
 }));
+
+const showCreateBookingModal = ref(false);
+const showInfoBookingModal = ref(false);
+const selectedBooking = ref<Booking | null>(null);
+const selectedTimeSlot = ref<{ hour: number; minutes: number } | null>(null);
+const selectedDayIndex = ref<number | null>(null);
 
 // Méthodes pour naviguer entre les semaines
 const goToPreviousWeek = () => {
@@ -156,9 +175,14 @@ const handleSlotClick = (
     timeSlot
   );
   if (booking) {
-    alert(`Réservation existante : ${booking.bookingTitle}`);
+    // Afficher la modal d'informations
+    selectedBooking.value = booking;
+    showInfoBookingModal.value = true;
   } else {
-    alert(`Créneau disponible : ${timeSlot.hour}:${timeSlot.minutes}`);
+    // Afficher la modal de création
+    selectedDayIndex.value = dayIndex;
+    selectedTimeSlot.value = timeSlot;
+    showCreateBookingModal.value = true;
   }
 };
 

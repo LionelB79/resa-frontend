@@ -1,25 +1,20 @@
 <template>
   <div class="modal">
-    <h3>Nouvelle réservation</h3>
-    <p>
-      Créneau sélectionné : {{ timeSlot.hour }}:{{ timeSlot.minutes }} - Jour
-      {{ dayIndex }}
-    </p>
+    <h3>Détails de la réservation</h3>
+    <p>Titre : {{ booking.bookingTitle }}</p>
+    <p>Organisateur : {{ booking.userEmail }}</p>
   </div>
 </template>
 
 <script>
 export default {
   props: {
-    timeSlot: {
+    booking: {
       type: Object,
       required: true,
     },
-    dayIndex: {
-      type: Number,
-      required: true,
-    },
   },
+  methods: {},
 };
 </script>
 
