@@ -67,14 +67,14 @@
         <select
           v-if="!roomStore.noRoomsFound"
           id="room-select"
-          :value="roomStore.selectedRoom?.id || ''"
+          :value="roomStore.selectedRoom?._id || ''"
           @change="onRoomChange($event)"
           class="select-input"
         >
           <option
             v-for="room in roomStore.filteredRooms"
-            :key="room.id"
-            :value="room.id"
+            :key="room._id"
+            :value="room._id"
           >
             {{ room.name }}
           </option>
@@ -90,11 +90,11 @@
 <script setup>
 import { onMounted } from "vue";
 import { useRoomStore } from "@/stores/roomStore";
-import { ROOM_CAPACITIES } from "@/constants/constants";
+import { CONSTANT_ROOM_CAPACITIES } from "@/constants/constants";
 import { ROOM_CONTROLS_MESSAGES } from "@/constants/messages";
 
 const roomStore = useRoomStore();
-const roomCapacities = ROOM_CAPACITIES;
+const roomCapacities = CONSTANT_ROOM_CAPACITIES;
 
 onMounted(() => {
   roomStore.fetchRooms();
@@ -139,19 +139,24 @@ const clearEquipments = () => {
 .controls-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
   background-color: #f9fafb;
-  padding: 1rem;
+  padding: 2rem;
   border: 1px solid #e2e8f0;
   border-radius: 0.5rem;
-  width: 60%;
+  width: 70%;
+  margin: 0 auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  align-items: center;
 }
 
 .filters {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  justify-content: center;
+  align-items: center;
   gap: 2rem;
+  width: 100%;
   flex-wrap: wrap;
 }
 
@@ -159,6 +164,7 @@ const clearEquipments = () => {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  align-items: center;
   min-width: 200px;
 }
 
@@ -189,6 +195,7 @@ const clearEquipments = () => {
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.5rem;
+  justify-content: center;
 }
 
 .equipment-bubble {
