@@ -16,7 +16,6 @@
         v-model="bookingTitle"
         type="text"
         placeholder="Entrez un titre"
-        required
       />
     </div>
 
@@ -71,8 +70,12 @@ const bookingTitle = ref("");
 const userEmail = ref("");
 const selectedDuration = ref(15);
 
-// Vérifie que le champ n'est pas vide
-const isFormValid = computed(() => userEmail.value.trim());
+// Vérifie que le champ n'est pas vide et que le mail est bien un mail
+const isFormValid = computed(
+  () =>
+    userEmail.value.trim() !== "" &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail.value)
+);
 
 // On force l'affichage de 2 caractère pour les minutes ( 5 -> 05)
 const padMinutes = (minutes: number) => minutes.toString().padStart(2, "0");
