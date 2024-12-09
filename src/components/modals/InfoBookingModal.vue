@@ -4,9 +4,13 @@
       <h3>Détails de la réservation</h3>
       <p>Titre : {{ booking.bookingTitle }}</p>
       <p>Organisateur : {{ booking.userEmail }}</p>
+
+      <div class="modal-actions">
+        <button @click="$emit('close')">Fermer</button>
+      </div>
     </div>
 
-    <div class="modal-overlay"></div>
+    <div class="modal-overlay" @click="$emit('close')"></div>
   </div>
 </template>
 
@@ -18,6 +22,7 @@ export default {
       required: true,
     },
   },
+  emits: ["close"],
 };
 </script>
 
@@ -50,5 +55,25 @@ export default {
   width: 90%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f44336;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #d32f2f;
 }
 </style>
