@@ -15,6 +15,11 @@
         existante. <br />
         Veuillez réduire la durée.
       </p>
+
+      <p v-if="isEndTimeAfter18h" class="text-red-500">
+        La réservation ne peut pas se terminer après 18h. Veuillez réduire la
+        durée.
+      </p>
       <div class="form-group">
         <label for="booking-title">Titre de la réservation</label>
         <input
@@ -52,7 +57,7 @@
       <div class="modal-actions">
         <button
           @click="createBooking"
-          :disabled="!isFormValid || isOverlappingSlot"
+          :disabled="!isFormValid || isOverlappingSlot || isEndTimeAfter18h"
         >
           Réserver
         </button>
@@ -107,6 +112,14 @@ const isSlotExpired = computed(() => {
 
   return isPast(targetDateTime);
 });
+// Vérifie si l'heure de fin dépasse 18h
+const isEndTimeAfter18h = computed(() => {
+  console.log("formattedEndTime.value", formattedEndTime.value);
+  const endHour = parseInt(formattedEndTime.value.split(":")[0]);
+  console.log("endHour", endHour);
+  return endHour > 18;
+});
+
 // Affiche la date dans la modal en fr
 const formattedDate = computed(() => {
   const bookingDate = addDays(bookingStore.selectedWeek, props.dayIndex);
