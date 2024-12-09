@@ -8,17 +8,16 @@
         Créneau : {{ formattedStartTime }} - {{ formattedEndTime }}
       </p>
       <p v-if="isSlotExpired" class="text-red-500">
-        Le créneau sélectionné est déjà passé.
+        {{ ROOM_CONTROLS_MESSAGES.SLOT_EXPIRED }}
       </p>
       <p v-if="isOverlappingSlot" class="text-red-500">
-        Ce créneau n'est pas disponible car il chevauche une réservation
-        existante. <br />
-        Veuillez réduire la durée.
+        {{ ROOM_CONTROLS_MESSAGES.SLOT_OVERLAPPING }} <br />
+        {{ ROOM_CONTROLS_MESSAGES.REDUCE_THE_DURATION }}
       </p>
 
       <p v-if="isEndTimeAfter18h" class="text-red-500">
-        La réservation ne peut pas se terminer après 18h. Veuillez réduire la
-        durée.
+        {{ ROOM_CONTROLS_MESSAGES.END_TIME_AFTER_18H }} <br />
+        {{ ROOM_CONTROLS_MESSAGES.REDUCE_THE_DURATION }}
       </p>
       <div class="form-group">
         <label for="booking-title">Titre de la réservation</label>
@@ -75,6 +74,7 @@ import { useBookingStore } from "@/stores/bookingStore";
 import { addDays, setHours, setMinutes, isPast } from "date-fns";
 import { fr } from "date-fns/locale";
 import { CONSTANT_DURATION_OPTIONS } from "@/constants/constants";
+import { ROOM_CONTROLS_MESSAGES } from "@/constants/messages";
 import { format } from "date-fns-tz";
 const props = defineProps<{
   timeSlot: {
@@ -114,10 +114,10 @@ const isSlotExpired = computed(() => {
 });
 // Vérifie si l'heure de fin dépasse 18h
 const isEndTimeAfter18h = computed(() => {
-  console.log("formattedEndTime.value", formattedEndTime.value);
   const endHour = parseInt(formattedEndTime.value.split(":")[0]);
-  console.log("endHour", endHour);
-  return endHour > 18;
+  const endMinute = parseInt(formattedEndTime.value.split(":")[1]);
+
+  return endHour > 18 || (endHour === 18 && endMinute > 0);
 });
 
 // Affiche la date dans la modal en fr
