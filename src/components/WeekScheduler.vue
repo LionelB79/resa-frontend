@@ -2,9 +2,11 @@
   <div class="week-scheduler">
     <!-- header + navigation entre semaines -->
     <div class="header">
-      <button @click="goToPreviousWeek">← Semaine précédente</button>
-      <span>{{ formattedWeekRange }}</span>
-      <button @click="goToNextWeek">Semaine suivante →</button>
+      <button @click="bookingStore.goToPreviousWeek">
+        ← Semaine précédente
+      </button>
+      <span>{{ bookingStore.getFormattedWeekRange() }}</span>
+      <button @click="bookingStore.goToNextWeek">Semaine suivante →</button>
     </div>
 
     <!-- Tableau représentant le planning -->
@@ -14,7 +16,7 @@
         <tr>
           <th>Heures</th>
           <th v-for="(day, index) in CONSTANT_DAYS_OF_WEEK" :key="index">
-            {{ day }} - {{ formatDayWithMonth(index) }}
+            {{ day }} - {{ bookingStore.formatDayWithMonth(index) }}
           </th>
         </tr>
       </thead>
@@ -35,42 +37,27 @@
             @click="handleSlotClick(dayIndex - 1, timeSlot)"
           >
             <div
-              v-if="
-                bookingStore.findBooking(selectedWeek, dayIndex - 1, timeSlot)
-              "
+              v-if="bookingStore.findBooking(dayIndex - 1, timeSlot)"
               :class="{
                 'booking-first-slot': bookingStore.isFirstSlotOfBooking(
-                  selectedWeek,
                   dayIndex - 1,
                   timeSlot
                 ),
                 'booking-continuation': !bookingStore.isFirstSlotOfBooking(
-                  selectedWeek,
                   dayIndex - 1,
                   timeSlot
                 ),
               }"
             >
               <small
-                v-if="
-                  bookingStore.isFirstSlotOfBooking(
-                    selectedWeek,
-                    dayIndex - 1,
-                    timeSlot
-                  )
-                "
+                v-if="bookingStore.isFirstSlotOfBooking(dayIndex - 1, timeSlot)"
               >
                 {{
-                  bookingStore.findBooking(selectedWeek, dayIndex - 1, timeSlot)
-                    ?.bookingTitle
+                  bookingStore.findBooking(dayIndex - 1, timeSlot)?.bookingTitle
                 }}
                 {{
                   bookingStore.formatBookingTime(
-                    bookingStore.findBooking(
-                      selectedWeek,
-                      dayIndex - 1,
-                      timeSlot
-                    )
+                    bookingStore.findBooking(dayIndex - 1, timeSlot)
                   )
                 }}
               </small>
@@ -80,12 +67,24 @@
       </tbody>
     </table>
 
+    <!-- Modals -->
+    <CreateBookingModal
+      v-if="showCreateBookingModal"
+      :timeSlot="selectedTimeSlot"
+      :dayIndex="selectedDayIndex"
+      @close="showCreateBookingModal = false"
+    />
+    <InfoBookingModal
+      v-if="showInfoBookingModal"
+      :booking="selectedBooking"
+      @close="showInfoBookingModal = false"
+    />
     <!--Informations debug -->
     <div class="debug-info">
       <h3>Debug Information</h3>
       <p>Selected Room: {{ roomStore.selectedRoom?._id }}</p>
-      <p>Semaine sélectionnée : {{ selectedWeek }}</p>
-      <p>Plage de semaine : {{ formattedWeekRange }}</p>
+      <p>Semaine sélectionnée : {{ bookingStore.selectedWeek }}</p>
+      <p>Plage de semaine : {{ bookingStore.getFormattedWeekRange() }}</p>
       <h4>Réservations :</h4>
       <pre>{{ JSON.stringify(slots, null, 2) }}</pre>
     </div>
@@ -93,18 +92,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from "vue";
-import { addDays, format, startOfWeek } from "date-fns";
-import {
-  CONSTANT_D_MMM_YYYY,
-  CONSTANT_DAYS_OF_WEEK,
-} from "@/constants/constants";
+import { ref, onMounted, watch } from "vue";
+import { CONSTANT_DAYS_OF_WEEK } from "@/constants/constants";
 import { useRoomStore } from "@/stores/roomStore";
 import { useBookingStore } from "@/stores/bookingStore";
 import { Booking } from "@/types/booking";
-
+import CreateBookingModal from "./modals/CreateBookingModal.vue";
+import InfoBookingModal from "./modals/InfoBookingModal.vue";
 // semaine sélectionnée (reactive), on l'initialise avec les jours correspondant aux date avec startOfWeek
-const selectedWeek = ref(startOfWeek(new Date(), { weekStartsOn: 1 }));
 const roomStore = useRoomStore();
 const bookingStore = useBookingStore();
 // ajout slots pour y attribuer les bookings récupérés pour la semaine
@@ -116,49 +111,27 @@ const timeSlots = Array.from({ length: (18 - 8) * 4 }, (_, i) => ({
   minutes: (i % 4) * 15,
 }));
 
-// Méthodes pour naviguer entre les semaines
-const goToPreviousWeek = () => {
-  selectedWeek.value = addDays(selectedWeek.value, -7);
-  if (roomStore.selectedRoom) {
-    bookingStore.fetchBookings(selectedWeek.value);
-  }
-};
-const goToNextWeek = () => {
-  selectedWeek.value = addDays(selectedWeek.value, 7);
-  if (roomStore.selectedRoom) {
-    bookingStore.fetchBookings(selectedWeek.value);
-  }
-};
-
-// Affichage jour num Mois exemple: Lundi-2 Dec
-const formatDayWithMonth = (dayIndex: number) => {
-  const dayDate = addDays(selectedWeek.value, dayIndex);
-  console.log("dayDate", dayDate);
-  return format(dayDate, "d MMM");
-};
-
-// Calcul de la plage de dates de la semaine
-const formattedWeekRange = computed(() => {
-  const start = format(selectedWeek.value, CONSTANT_D_MMM_YYYY);
-  const end = format(addDays(selectedWeek.value, 6), CONSTANT_D_MMM_YYYY);
-
-  return `${start} - ${end}`;
-});
+const showCreateBookingModal = ref(false);
+const showInfoBookingModal = ref(false);
+const selectedBooking = ref<Booking | null>(null);
+const selectedTimeSlot = ref<{ hour: number; minutes: number } | null>(null);
+const selectedDayIndex = ref<number | null>(null);
 
 // Gestion des clics sur les créneaux
 const handleSlotClick = (
   dayIndex: number,
   timeSlot: { hour: number; minutes: number }
 ) => {
-  const booking = bookingStore.findBooking(
-    selectedWeek.value,
-    dayIndex,
-    timeSlot
-  );
+  const booking = bookingStore.findBooking(dayIndex, timeSlot);
   if (booking) {
-    alert(`Réservation existante : ${booking.bookingTitle}`);
+    // Afficher la modal d'informations
+    selectedBooking.value = booking;
+    showInfoBookingModal.value = true;
   } else {
-    alert(`Créneau disponible : ${timeSlot.hour}:${timeSlot.minutes}`);
+    // Afficher la modal de création
+    selectedDayIndex.value = dayIndex;
+    selectedTimeSlot.value = timeSlot;
+    showCreateBookingModal.value = true;
   }
 };
 
@@ -166,11 +139,7 @@ const getSlotClass = (
   dayIndex: number,
   timeSlot: { hour: number; minutes: number }
 ) => {
-  const booking = bookingStore.findBooking(
-    selectedWeek.value,
-    dayIndex,
-    timeSlot
-  );
+  const booking = bookingStore.findBooking(dayIndex, timeSlot);
   if (booking) {
     return {
       reserved: true,
@@ -184,7 +153,7 @@ watch(
   () => roomStore.selectedRoom,
   (newRoom) => {
     if (newRoom) {
-      bookingStore.fetchBookings(selectedWeek.value);
+      bookingStore.fetchBookings();
     }
   }
 );
@@ -196,7 +165,7 @@ onMounted(async () => {
   }
 
   if (roomStore.selectedRoom) {
-    bookingStore.fetchBookings(selectedWeek.value);
+    bookingStore.fetchBookings();
   } else {
     console.warn("Aucune salle sélectionnée au montage");
   }
