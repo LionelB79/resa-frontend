@@ -2,8 +2,16 @@
   <div class="modal-wrapper">
     <div class="modal">
       <h3>Détails de la réservation</h3>
-      <p>Titre : {{ booking.bookingTitle }}</p>
-      <p>Organisateur : {{ booking.userEmail }}</p>
+      <p>
+        Date : {{ formattedDate }}
+        <br />
+        Créneau : {{ formattedTime }}
+      </p>
+
+      <div class="booking-details">
+        <p><strong>Titre :</strong> {{ booking.bookingTitle }}</p>
+        <p><strong>Organisateur :</strong> {{ booking.userEmail }}</p>
+      </div>
 
       <div class="modal-actions">
         <button @click="$emit('close')">Fermer</button>
@@ -14,16 +22,38 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    booking: {
-      type: Object,
-      required: true,
-    },
+<script setup lang="ts">
+import { computed, defineProps, defineEmits } from "vue";
+import { format, parseISO } from "date-fns";
+import { fr } from "date-fns/locale";
+
+const props = defineProps({
+  booking: {
+    type: Object,
+    required: true,
   },
-  emits: ["close"],
-};
+});
+
+const emit = defineEmits(["close"]);
+
+const formattedDate = computed(() => {
+  const date = parseISO(props.booking.startTime);
+  return format(date, "EEEE dd MMMM yyyy", { locale: fr });
+});
+
+const formattedTime = computed(() => {
+  const startTime = format(parseISO(props.booking.startTime), "HH:mm");
+  const endTime = format(parseISO(props.booking.endTime), "HH:mm");
+  return `${startTime} - ${endTime}`;
+});
+</script>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  name: "InfoBookingModal",
+});
 </script>
 
 <style scoped>
@@ -75,5 +105,13 @@ button {
 
 button:hover {
   background-color: #d32f2f;
+}
+
+.booking-details {
+  margin: 15px 0;
+}
+
+.booking-details p {
+  margin-bottom: 10px;
 }
 </style>
