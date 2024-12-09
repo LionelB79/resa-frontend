@@ -160,7 +160,7 @@ export const useBookingStore = defineStore("bookings", {
       }
 
       // On créer la date/heure du booking (debut du booking)
-      const startDateUTC = new Date(
+      const startDate = new Date(
         Date.UTC(
           this.selectedWeek.getFullYear(),
           this.selectedWeek.getMonth(),
@@ -171,31 +171,34 @@ export const useBookingStore = defineStore("bookings", {
       );
 
       //On convertie en fuseau horaire de Paris utc+1() sinon enregistrement avec 1h de decalage)
-      const startDateParis = formatInTimeZone(
-        startDateUTC,
-        CONSTANT_TIMEZONE_PARIS,
+      const startDateUTC = formatInTimeZone(
+        startDate,
+        CONSTANT_TIMEZONE_UTC,
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
       );
 
       // On calcule la date de fin avec la durée sélectionnée
-      const endDateUTC = new Date(
-        startDateUTC.getTime() + params.selectedDuration * 60000
+      const endDate = new Date(
+        startDate.getTime() + params.selectedDuration * 60000
       );
 
       // On convertie la date de fin en fuseau horaire de Paris
-      const endDateParis = formatInTimeZone(
-        endDateUTC,
-        CONSTANT_TIMEZONE_PARIS,
+      const endDateUTC = formatInTimeZone(
+        endDate,
+        CONSTANT_TIMEZONE_UTC,
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
       );
       // On envoie les données au backend
+      console.error("startDateParis", startDateUTC);
+      console.error("endDateParis", endDateUTC);
+
       try {
         const response = await apiClient.post(API_ENDPOINTS.BOOKINGS.CREATE, {
           userEmail: params.userEmail,
           roomId: roomStore.selectedRoom?._id,
           bookingTitle: params.bookingTitle,
-          startTime: startDateParis,
-          endTime: endDateParis,
+          startTime: startDateUTC,
+          endTime: endDateUTC,
         });
 
         // On actualise les réservations après la création
