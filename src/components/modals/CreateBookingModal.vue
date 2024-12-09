@@ -1,53 +1,59 @@
 <template>
-  <div class="modal">
-    <h3>Nouvelle réservation</h3>
-    <p>
-      Date : {{ formattedDate }}
-      <br />
-      Créneau : {{ formattedStartTime }} - {{ formattedEndTime }}
-    </p>
-    <p v-if="isSlotExpired" class="text-red-500">
-      Le créneau sélectionné est déjà passé.
-    </p>
+  <div class="modal-wrapper">
+    <div class="modal">
+      <h3>Nouvelle réservation</h3>
+      <p>
+        Date : {{ formattedDate }}
+        <br />
+        Créneau : {{ formattedStartTime }} - {{ formattedEndTime }}
+      </p>
+      <p v-if="isSlotExpired" class="text-red-500">
+        Le créneau sélectionné est déjà passé.
+      </p>
 
-    <div class="form-group">
-      <label for="booking-title">Titre de la réservation</label>
-      <input
-        id="booking-title"
-        v-model="bookingTitle"
-        type="text"
-        placeholder="Entrez un titre"
-      />
+      <div class="form-group">
+        <label for="booking-title">Titre de la réservation</label>
+        <input
+          id="booking-title"
+          v-model="bookingTitle"
+          type="text"
+          placeholder="Entrez un titre"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="booking-email">Email de réservation</label>
+        <input
+          id="booking-email"
+          v-model="userEmail"
+          type="email"
+          placeholder="Entrez votre email"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="booking-duration">Durée de la réservation</label>
+        <select id="booking-duration" v-model="selectedDuration" required>
+          <option
+            v-for="duration in CONSTANT_DURATION_OPTIONS"
+            :key="duration"
+            :value="duration"
+          >
+            {{ duration }} minutes
+          </option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button @click="createBooking" :disabled="!isFormValid">
+          Réserver
+        </button>
+        <button @click="$emit('close')">Annuler</button>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="booking-email">Email de réservation</label>
-      <input
-        id="booking-email"
-        v-model="userEmail"
-        type="email"
-        placeholder="Entrez votre email"
-        required
-      />
-    </div>
-
-    <div class="form-group">
-      <label for="booking-duration">Durée de la réservation</label>
-      <select id="booking-duration" v-model="selectedDuration" required>
-        <option
-          v-for="duration in CONSTANT_DURATION_OPTIONS"
-          :key="duration"
-          :value="duration"
-        >
-          {{ duration }} minutes
-        </option>
-      </select>
-    </div>
-
-    <div class="modal-actions">
-      <button @click="createBooking" :disabled="!isFormValid">Réserver</button>
-      <button @click="$emit('close')">Annuler</button>
-    </div>
+    <div class="modal-overlay" @click="$emit('close')"></div>
   </div>
 </template>
 
@@ -144,14 +150,40 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.modal-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
 .modal {
+  position: relative;
   background: white;
   border: 1px solid #ddd;
   padding: 20px;
   max-width: 400px;
-  margin: 0 auto;
+  width: 90%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
 }
+
+/* Masquer l'arrière-plan lorsque la modal est affichée */
 
 .form-group {
   margin-bottom: 15px;
@@ -191,11 +223,6 @@ button:first-child {
 button:last-child {
   background-color: #f44336;
   color: white;
-}
-
-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
 }
 
 .text-red-500 {
