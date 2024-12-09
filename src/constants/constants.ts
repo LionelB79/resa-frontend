@@ -19,3 +19,6 @@ export const CONSTANT_DAYS_OF_WEEK = [
 ];
 
 export const CONSTANT_TIMEZONE_UTC = "UTC";
+export const CONSTANT_TIMEZONE_PARIS = "Europe/Paris";
+
+export const CONSTANT_DURATION_OPTIONS = [15, 30, 45, 60, 75, 90, 105, 120];
