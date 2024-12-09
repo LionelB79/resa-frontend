@@ -23,33 +23,42 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, defineEmits } from "vue";
+import { computed, defineProps } from "vue";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
+import { formatInTimeZone } from "date-fns-tz";
+import { CONSTANT_TIMEZONE_UTC } from "@/constants/constants";
 
-const props = defineProps({
-  booking: {
-    type: Object,
-    required: true,
-  },
-});
+const props = defineProps<{
+  booking: Booking;
+}>();
 
-const emit = defineEmits(["close"]);
-
+// Formate la date en français
 const formattedDate = computed(() => {
   const date = parseISO(props.booking.startTime);
   return format(date, "EEEE dd MMMM yyyy", { locale: fr });
 });
 
+// Formate l'heure de début et de fin
 const formattedTime = computed(() => {
-  const startTime = format(parseISO(props.booking.startTime), "HH:mm");
-  const endTime = format(parseISO(props.booking.endTime), "HH:mm");
+  const startTime = formatInTimeZone(
+    props.booking.startTime,
+    CONSTANT_TIMEZONE_UTC,
+    "HH:mm"
+  );
+  const endTime = formatInTimeZone(
+    props.booking.endTime,
+    CONSTANT_TIMEZONE_UTC,
+    "HH:mm"
+  );
+
   return `${startTime} - ${endTime}`;
 });
 </script>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { Booking } from "@/types/booking";
 
 export default defineComponent({
   name: "InfoBookingModal",
@@ -66,6 +75,7 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal-overlay {
@@ -75,9 +85,11 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
 }
 
 .modal {
+  position: relative;
   background: white;
   border: 1px solid #ddd;
   padding: 20px;
@@ -85,6 +97,14 @@ export default defineComponent({
   width: 90%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
+}
+
+.booking-details {
+  margin: 15px 0;
+}
+
+.booking-details p {
+  margin-bottom: 10px;
 }
 
 .modal-actions {
@@ -105,13 +125,5 @@ button {
 
 button:hover {
   background-color: #d32f2f;
-}
-
-.booking-details {
-  margin: 15px 0;
-}
-
-.booking-details p {
-  margin-bottom: 10px;
 }
 </style>
