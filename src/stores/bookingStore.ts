@@ -41,7 +41,7 @@ export const useBookingStore = defineStore("bookings", {
           format(this.selectedWeek, "yyyy-MM-dd")
         );
         const response = await apiClient.get(url);
-
+        console.log("Réservations récupérées depuis l'API : ", response.data);
         // On attribue les bookings au slots
         this.slots = response.data;
         console.log("Réservations récupérées:", this.slots);

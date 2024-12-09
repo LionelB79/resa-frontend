@@ -10,7 +10,11 @@
       <p v-if="isSlotExpired" class="text-red-500">
         Le créneau sélectionné est déjà passé.
       </p>
-
+      <p v-if="isOverlappingSlot" class="text-red-500">
+        Ce créneau n'est pas disponible car il chevauche une réservation
+        existante. <br />
+        Veuillez réduire la durée.
+      </p>
       <div class="form-group">
         <label for="booking-title">Titre de la réservation</label>
         <input
@@ -46,7 +50,10 @@
       </div>
 
       <div class="modal-actions">
-        <button @click="createBooking" :disabled="!isFormValid">
+        <button
+          @click="createBooking"
+          :disabled="!isFormValid || isOverlappingSlot"
+        >
           Réserver
         </button>
         <button @click="$emit('close')">Annuler</button>
@@ -62,7 +69,8 @@ import { ref, computed, defineEmits, defineProps } from "vue";
 import { useBookingStore } from "@/stores/bookingStore";
 import { addDays, setHours, setMinutes, isPast } from "date-fns";
 import { fr } from "date-fns/locale";
-
+import { CONSTANT_DURATION_OPTIONS } from "@/constants/constants";
+import { format } from "date-fns-tz";
 const props = defineProps<{
   timeSlot: {
     hour: number;
@@ -86,9 +94,9 @@ const isFormValid = computed(
     userEmail.value.trim() !== "" &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail.value)
 );
-// Compute if the selected time slot is in the past
+
+// Vérifie si le slot est antérieur
 const isSlotExpired = computed(() => {
-  // Create the target date time for the selected slot
   const targetDateTime = setMinutes(
     setHours(
       addDays(bookingStore.selectedWeek, props.dayIndex),
@@ -97,10 +105,9 @@ const isSlotExpired = computed(() => {
     props.timeSlot.minutes
   );
 
-  // Check if the target date time is in the past
   return isPast(targetDateTime);
 });
-// Compute formatted date and times
+// Affiche la date dans la modal en fr
 const formattedDate = computed(() => {
   const bookingDate = addDays(bookingStore.selectedWeek, props.dayIndex);
   return format(bookingDate, "EEEE dd MMMM yyyy", { locale: fr });
@@ -137,12 +144,45 @@ const createBooking = async () => {
     console.error("Erreur lors de la création de la réservation", error);
   }
 };
+//TODO A améliorer en checkant uniquement le prochain booking
+// Vérifie si le créneau sélectionné chevauche un créneau existant
+const isOverlappingSlot = computed(() => {
+  // Crée précisément l'heure de début du nouveau créneau en UTC pour éviter les problèmes de fuseau horaire
+  const selectedStartTime = new Date(
+    Date.UTC(
+      bookingStore.selectedWeek.getFullYear(),
+      bookingStore.selectedWeek.getMonth(),
+      bookingStore.selectedWeek.getDate() + props.dayIndex,
+      props.timeSlot.hour,
+      props.timeSlot.minutes
+    )
+  );
+  // Calcule l'heure de fin du nouveau créneau en ajoutant la durée sélectionnée (en millisecondes)
+
+  const selectedEndTime = new Date(
+    selectedStartTime.getTime() + selectedDuration.value * 60000
+  );
+
+  // Vérifie s'il y a un chevauchement avec l'une des réservations existantes
+  return bookingStore.slots.some((booking) => {
+    const bookingStartTime = new Date(booking.startTime);
+    const bookingEndTime = new Date(booking.endTime);
+
+    const isOverlapping =
+      (selectedStartTime >= bookingStartTime &&
+        selectedStartTime < bookingEndTime) || // Le début du créneau est dans une réservation existante (normalement impossible)
+      (selectedEndTime > bookingStartTime &&
+        selectedEndTime <= bookingEndTime) || // La fin du créneau est dans une réservation existante
+      (selectedStartTime <= bookingStartTime &&
+        selectedEndTime >= bookingEndTime); // Le créneau englobe complètement une réservation existante
+
+    return isOverlapping;
+  });
+});
 </script>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { CONSTANT_DURATION_OPTIONS } from "@/constants/constants";
-import { format } from "date-fns-tz";
 
 export default defineComponent({
   name: "CreateBookingModal",
