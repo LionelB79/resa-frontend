@@ -1,5 +1,5 @@
 <template>
-  <p>weekRoomView</p>
+  <h2>Resa</h2>
   <router-view />
 </template>
 

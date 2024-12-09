@@ -11,18 +11,34 @@
 
     <div class="form-group">
       <label for="booking-title">Titre de la réservation</label>
-      <input id="booking-title" v-model="bookingTitle" type="text" placeholder="Entrez un titre" required />
+      <input
+        id="booking-title"
+        v-model="bookingTitle"
+        type="text"
+        placeholder="Entrez un titre"
+        required
+      />
     </div>
 
     <div class="form-group">
       <label for="booking-email">Email de réservation</label>
-      <input id="booking-email" v-model="userEmail" type="email" placeholder="Entrez votre email" required />
+      <input
+        id="booking-email"
+        v-model="userEmail"
+        type="email"
+        placeholder="Entrez votre email"
+        required
+      />
     </div>
 
     <div class="form-group">
       <label for="booking-duration">Durée de la réservation</label>
       <select id="booking-duration" v-model="selectedDuration" required>
-        <option v-for="duration in CONSTANT_DURATION_OPTIONS" :key="duration" :value="duration">
+        <option
+          v-for="duration in CONSTANT_DURATION_OPTIONS"
+          :key="duration"
+          :value="duration"
+        >
           {{ duration }} minutes
         </option>
       </select>
@@ -55,16 +71,11 @@ const bookingTitle = ref("");
 const userEmail = ref("");
 const selectedDuration = ref(15);
 
-
 // Vérifie que le champ n'est pas vide
-const isFormValid = computed(
-  () =>
-    userEmail.value.trim()
-);
+const isFormValid = computed(() => userEmail.value.trim());
 
 // On force l'affichage de 2 caractère pour les minutes ( 5 -> 05)
 const padMinutes = (minutes: number) => minutes.toString().padStart(2, "0");
-
 
 const createBooking = async () => {
   try {
