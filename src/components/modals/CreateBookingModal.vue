@@ -213,11 +213,17 @@ button {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 button:first-child {
   background-color: #4caf50;
   color: white;
+}
+
+button:first-child:disabled {
+  background-color: #cccccc;
+  color: #666666;
 }
 
 button:last-child {
