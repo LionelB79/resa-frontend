@@ -8,6 +8,9 @@
       - Jour
       {{ dayIndex + 1 }}
     </p>
+    <p v-if="isSlotExpired" class="text-red-500">
+      Le créneau sélectionné est déjà passé.
+    </p>
 
     <div class="form-group">
       <label for="booking-title">Titre de la réservation</label>
@@ -53,6 +56,8 @@
 <script setup lang="ts">
 import { ref, computed, defineEmits, defineProps } from "vue";
 import { useBookingStore } from "@/stores/bookingStore";
+import { addDays, setHours, setMinutes, isPast } from "date-fns";
+
 const props = defineProps<{
   timeSlot: {
     hour: number;
@@ -76,6 +81,20 @@ const isFormValid = computed(
     userEmail.value.trim() !== "" &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail.value)
 );
+// Compute if the selected time slot is in the past
+const isSlotExpired = computed(() => {
+  // Create the target date time for the selected slot
+  const targetDateTime = setMinutes(
+    setHours(
+      addDays(bookingStore.selectedWeek, props.dayIndex),
+      props.timeSlot.hour
+    ),
+    props.timeSlot.minutes
+  );
+
+  // Check if the target date time is in the past
+  return isPast(targetDateTime);
+});
 
 // On force l'affichage de 2 caractère pour les minutes ( 5 -> 05)
 const padMinutes = (minutes: number) => minutes.toString().padStart(2, "0");
@@ -159,5 +178,9 @@ button:last-child {
 button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
+}
+
+.text-red-500 {
+  color: red;
 }
 </style>
