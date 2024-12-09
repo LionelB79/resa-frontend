@@ -18,6 +18,6 @@ export const API_ENDPOINTS = {
     GET_ROOM_BOOKINGS_FOR_WEEK: (roomId: string, weekStart: string) =>
       `/booking/room/${roomId}/week?weekStart=${weekStart}`,
 
-    CREATE: "/bookings",
+    CREATE: "/booking",
   },
 };
