@@ -2,11 +2,9 @@
   <div class="modal">
     <h3>Nouvelle réservation</h3>
     <p>
-      Créneau sélectionné : {{ timeSlot.hour }}:{{
-        padMinutes(timeSlot.minutes)
-      }}
-      - Jour
-      {{ dayIndex + 1 }}
+      Date : {{ formattedDate }}
+      <br />
+      Créneau : {{ formattedStartTime }} - {{ formattedEndTime }}
     </p>
     <p v-if="isSlotExpired" class="text-red-500">
       Le créneau sélectionné est déjà passé.
@@ -57,6 +55,7 @@
 import { ref, computed, defineEmits, defineProps } from "vue";
 import { useBookingStore } from "@/stores/bookingStore";
 import { addDays, setHours, setMinutes, isPast } from "date-fns";
+import { fr } from "date-fns/locale";
 
 const props = defineProps<{
   timeSlot: {
@@ -95,9 +94,27 @@ const isSlotExpired = computed(() => {
   // Check if the target date time is in the past
   return isPast(targetDateTime);
 });
+// Compute formatted date and times
+const formattedDate = computed(() => {
+  const bookingDate = addDays(bookingStore.selectedWeek, props.dayIndex);
+  return format(bookingDate, "EEEE dd MMMM yyyy", { locale: fr });
+});
 
-// On force l'affichage de 2 caractère pour les minutes ( 5 -> 05)
-const padMinutes = (minutes: number) => minutes.toString().padStart(2, "0");
+const formattedStartTime = computed(() => {
+  return `${props.timeSlot.hour
+    .toString()
+    .padStart(2, "0")}:${props.timeSlot.minutes.toString().padStart(2, "0")}`;
+});
+
+const formattedEndTime = computed(() => {
+  const startMinutes = props.timeSlot.hour * 60 + props.timeSlot.minutes;
+  const endMinutes = startMinutes + selectedDuration.value;
+  const endHour = Math.floor(endMinutes / 60);
+  const endMinute = endMinutes % 60;
+  return `${endHour.toString().padStart(2, "0")}:${endMinute
+    .toString()
+    .padStart(2, "0")}`;
+});
 
 const createBooking = async () => {
   try {
@@ -119,6 +136,7 @@ const createBooking = async () => {
 <script lang="ts">
 import { defineComponent } from "vue";
 import { CONSTANT_DURATION_OPTIONS } from "@/constants/constants";
+import { format } from "date-fns-tz";
 
 export default defineComponent({
   name: "CreateBookingModal",
