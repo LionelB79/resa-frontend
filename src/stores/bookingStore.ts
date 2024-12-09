@@ -14,9 +14,9 @@ import { API_ENDPOINTS } from "@/constants/api-constants";
 import { formatInTimeZone } from "date-fns-tz";
 import {
   CONSTANT_D_MMM_YYYY,
-  CONSTANT_TIMEZONE_PARIS,
   CONSTANT_TIMEZONE_UTC,
 } from "@/constants/constants";
+import { fr } from "date-fns/locale";
 
 export const useBookingStore = defineStore("bookings", {
   state: () => ({
@@ -134,13 +134,17 @@ export const useBookingStore = defineStore("bookings", {
 
     formatDayWithMonth(dayIndex: number): string {
       const dayDate = addDays(this.selectedWeek, dayIndex);
-      return format(dayDate, "d MMM");
+      return format(dayDate, "d MMM", { locale: fr });
     },
     // Calcul de la plage de dates de la semaine
 
     getFormattedWeekRange(): string {
-      const start = format(this.selectedWeek, CONSTANT_D_MMM_YYYY);
-      const end = format(addDays(this.selectedWeek, 6), CONSTANT_D_MMM_YYYY);
+      const start = format(this.selectedWeek, CONSTANT_D_MMM_YYYY, {
+        locale: fr,
+      });
+      const end = format(addDays(this.selectedWeek, 6), CONSTANT_D_MMM_YYYY, {
+        locale: fr,
+      });
 
       return `${start} - ${end}`;
     },
