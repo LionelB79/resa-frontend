@@ -14,6 +14,7 @@ import { API_ENDPOINTS } from "@/constants/api-constants";
 import { formatInTimeZone } from "date-fns-tz";
 import {
   CONSTANT_D_MMM_YYYY,
+  CONSTANT_TIMEZONE_PARIS,
   CONSTANT_TIMEZONE_UTC,
 } from "@/constants/constants";
 
@@ -142,6 +143,38 @@ export const useBookingStore = defineStore("bookings", {
       const end = format(addDays(this.selectedWeek, 6), CONSTANT_D_MMM_YYYY);
 
       return `${start} - ${end}`;
+    },
+    async createBooking(params: {
+      bookingTitle: string;
+      userEmail: string;
+      dayIndex: number;
+      timeSlot: { hour: number; minutes: number };
+      selectedDuration: number;
+    }) {
+      const roomStore = useRoomStore();
+
+      // Vérification qu'une room est sélectionnée
+      if (!roomStore.selectedRoom) {
+        console.error("Aucune salle sélectionnée");
+        throw new Error("Aucune salle sélectionnée");
+      }
+
+      // On créer la date/heure du booking (debut du booking)
+
+      //On convertie en fuseau horaire de Paris utc+1() sinon enregistrement avec 1h de decalage)
+
+      // On envoie les données au backend
+      try {
+        const response = null;
+
+        // On actualise les réservations après la création
+        await this.fetchBookings();
+
+        return response;
+      } catch (error) {
+        console.error("Erreur lors de la création de la réservation", error);
+        throw error;
+      }
     },
   },
 
