@@ -69,13 +69,13 @@
 
     <!-- Modals -->
     <CreateBookingModal
-      v-if="showCreateBookingModal"
+      v-if="showCreateBookingModal && selectedTimeSlot && selectedDayIndex"
       :timeSlot="selectedTimeSlot"
       :dayIndex="selectedDayIndex"
       @close="showCreateBookingModal = false"
     />
     <InfoBookingModal
-      v-if="showInfoBookingModal"
+      v-if="showInfoBookingModal && selectedBooking"
       :booking="selectedBooking"
       @close="showInfoBookingModal = false"
     />
