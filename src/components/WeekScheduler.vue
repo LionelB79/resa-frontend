@@ -2,11 +2,13 @@
   <div class="week-scheduler">
     <!-- header + navigation entre semaines -->
     <div class="header">
-      <button @click="bookingStore.goToPreviousWeek">
+      <v-btn @click="bookingStore.goToPreviousWeek" outlined class="week-nav-btn">
         ← Semaine précédente
-      </button>
+      </v-btn>
       <span>{{ bookingStore.getFormattedWeekRange() }}</span>
-      <button @click="bookingStore.goToNextWeek">Semaine suivante →</button>
+      <v-btn @click="bookingStore.goToNextWeek" outlined class="week-nav-btn">
+        Semaine suivante →
+      </v-btn>
     </div>
 
     <!-- Tableau représentant le planning -->
@@ -23,35 +25,23 @@
 
       <!-- Corps du tableau avec les créneaux horaires -->
       <tbody>
-        <tr
-          v-for="timeSlot in timeSlots"
-          :key="timeSlot.hour + timeSlot.minutes"
-        >
+        <tr v-for="timeSlot in timeSlots" :key="timeSlot.hour + timeSlot.minutes">
           <td v-if="timeSlot.minutes === 0" class="time-cell" :rowspan="4">
             {{ timeSlot.hour }}:00
           </td>
-          <td
-            v-for="dayIndex in 7"
-            :key="dayIndex"
-            :class="getSlotClass(dayIndex - 1, timeSlot)"
-            @click="handleSlotClick(dayIndex - 1, timeSlot)"
-          >
-            <div
-              v-if="bookingStore.findBooking(dayIndex - 1, timeSlot)"
-              :class="{
-                'booking-first-slot': bookingStore.isFirstSlotOfBooking(
-                  dayIndex - 1,
-                  timeSlot
-                ),
-                'booking-continuation': !bookingStore.isFirstSlotOfBooking(
-                  dayIndex - 1,
-                  timeSlot
-                ),
-              }"
-            >
-              <small
-                v-if="bookingStore.isFirstSlotOfBooking(dayIndex - 1, timeSlot)"
-              >
+          <td v-for="dayIndex in 7" :key="dayIndex" :class="getSlotClass(dayIndex - 1, timeSlot)"
+            @click="handleSlotClick(dayIndex - 1, timeSlot)">
+            <div v-if="bookingStore.findBooking(dayIndex - 1, timeSlot)" :class="{
+              'booking-first-slot': bookingStore.isFirstSlotOfBooking(
+                dayIndex - 1,
+                timeSlot
+              ),
+              'booking-continuation': !bookingStore.isFirstSlotOfBooking(
+                dayIndex - 1,
+                timeSlot
+              ),
+            }">
+              <small v-if="bookingStore.isFirstSlotOfBooking(dayIndex - 1, timeSlot)">
                 {{
                   bookingStore.findBooking(dayIndex - 1, timeSlot)?.bookingTitle
                 }}
@@ -68,17 +58,10 @@
     </table>
 
     <!-- Modals -->
-    <CreateBookingModal
-      v-if="showCreateBookingModal && selectedTimeSlot && selectedDayIndex"
-      :timeSlot="selectedTimeSlot"
-      :dayIndex="selectedDayIndex"
-      @close="showCreateBookingModal = false"
-    />
-    <InfoBookingModal
-      v-if="showInfoBookingModal && selectedBooking"
-      :booking="selectedBooking"
-      @close="showInfoBookingModal = false"
-    />
+    <CreateBookingModal v-if="showCreateBookingModal && selectedTimeSlot && selectedDayIndex"
+      :timeSlot="selectedTimeSlot" :dayIndex="selectedDayIndex" @close="showCreateBookingModal = false" />
+    <InfoBookingModal v-if="showInfoBookingModal && selectedBooking" :booking="selectedBooking"
+      @close="showInfoBookingModal = false" />
     <!--Informations debug -->
     <div class="debug-info">
       <h3>Debug Information</h3>
@@ -187,8 +170,21 @@ onMounted(async () => {
 
 .header {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  padding-bottom: 5px;
+}
+
+.week-nav-btn {
+  font-size: 11px;
+  color: #ffffff;
+  background-color: #3d86c5;
+  border-color: #1e4f7a;
+  padding: 2px 2px;
+  height: 10px;
+  line-height: normal;
+  width: 175px;
 }
 
 .week-table {
