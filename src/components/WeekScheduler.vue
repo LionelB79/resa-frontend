@@ -102,7 +102,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
-import { CONSTANT_DAYS_OF_WEEK } from "@/constants/constants";
+import {
+  CONSTANT_DAYS_OF_WEEK,
+  CONSTANT_FRENCH_HOLIDAYS,
+} from "@/constants/constants";
 import { useRoomStore } from "@/stores/roomStore";
 import { useBookingStore } from "@/stores/bookingStore";
 import { Booking } from "@/types/booking";
@@ -148,6 +151,10 @@ const getSlotClass = (
   dayIndex: number,
   timeSlot: { hour: number; minutes: number }
 ) => {
+  if (isDayNonReservable(dayIndex)) {
+    return { nonReservable: true };
+  }
+
   const booking = bookingStore.findBooking(dayIndex, timeSlot);
   if (booking) {
     return {
@@ -155,6 +162,22 @@ const getSlotClass = (
     };
   }
   return { available: true };
+};
+
+const isDayNonReservable = (dayIndex: number): boolean => {
+  const currentDate = new Date(
+    bookingStore.selectedWeek.getTime() + dayIndex * 24 * 60 * 60 * 1000
+  );
+
+  const year = currentDate.getFullYear();
+  const formattedDate = currentDate.toISOString().split("T")[0];
+
+  const holidays = CONSTANT_FRENCH_HOLIDAYS(year);
+
+  const isWeekend = currentDate.getDay() === 6 || currentDate.getDay() === 0; // Samedi ou Dimanche
+  const isHoliday = holidays.includes(formattedDate);
+  console.log("holidays", holidays);
+  return isWeekend || isHoliday;
 };
 
 // Observateur pour charger les réservations quand la salle change
@@ -276,5 +299,15 @@ td:hover {
 
 .week-table td.reserved {
   border: none;
+}
+
+.nonReservable {
+  background-color: #d3d3d3;
+  /* Gris clair */
+  color: #a9a9a9;
+  /* Texte grisé */
+  pointer-events: none;
+  /* Désactive les clics */
+  cursor: not-allowed;
 }
 </style>
