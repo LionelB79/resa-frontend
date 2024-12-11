@@ -2,11 +2,17 @@
   <div class="week-scheduler">
     <!-- header + navigation entre semaines -->
     <div class="header">
-      <button @click="bookingStore.goToPreviousWeek">
+      <v-btn
+        @click="bookingStore.goToPreviousWeek"
+        outlined
+        class="week-nav-btn"
+      >
         ← Semaine précédente
-      </button>
+      </v-btn>
       <span>{{ bookingStore.getFormattedWeekRange() }}</span>
-      <button @click="bookingStore.goToNextWeek">Semaine suivante →</button>
+      <v-btn @click="bookingStore.goToNextWeek" outlined class="week-nav-btn">
+        Semaine suivante →
+      </v-btn>
     </div>
 
     <!-- Tableau représentant le planning -->
@@ -69,13 +75,16 @@
 
     <!-- Modals -->
     <CreateBookingModal
-      v-if="showCreateBookingModal"
+      v-if="
+        // On met selectedDayIndex !== null sinon le lundi n'est pas reservable (jour 0)
+        showCreateBookingModal && selectedTimeSlot && selectedDayIndex !== null
+      "
       :timeSlot="selectedTimeSlot"
       :dayIndex="selectedDayIndex"
       @close="showCreateBookingModal = false"
     />
     <InfoBookingModal
-      v-if="showInfoBookingModal"
+      v-if="showInfoBookingModal && selectedBooking"
       :booking="selectedBooking"
       @close="showInfoBookingModal = false"
     />
@@ -93,7 +102,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
-import { CONSTANT_DAYS_OF_WEEK } from "@/constants/constants";
+import {
+  CONSTANT_DAYS_OF_WEEK,
+  CONSTANT_FRENCH_HOLIDAYS,
+} from "@/constants/constants";
 import { useRoomStore } from "@/stores/roomStore";
 import { useBookingStore } from "@/stores/bookingStore";
 import { Booking } from "@/types/booking";
@@ -139,6 +151,10 @@ const getSlotClass = (
   dayIndex: number,
   timeSlot: { hour: number; minutes: number }
 ) => {
+  if (isDayNonReservable(dayIndex)) {
+    return { nonReservable: true };
+  }
+
   const booking = bookingStore.findBooking(dayIndex, timeSlot);
   if (booking) {
     return {
@@ -146,6 +162,20 @@ const getSlotClass = (
     };
   }
   return { available: true };
+};
+
+const isDayNonReservable = (dayIndex: number): boolean => {
+  const currentDate = new Date(
+    bookingStore.selectedWeek.getTime() + dayIndex * 24 * 60 * 60 * 1000
+  );
+  // const year = currentDate.getFullYear();
+  // const formattedDate = currentDate.toISOString().split("T")[0];
+  // const holidays = CONSTANT_FRENCH_HOLIDAYS(year);
+
+  const isWeekend = currentDate.getDay() === 6 || currentDate.getDay() === 0; // Samedi ou Dimanche
+
+  //  const isHoliday = holidays.includes(formattedDate);
+  return isWeekend;
 };
 
 // Observateur pour charger les réservations quand la salle change
@@ -187,8 +217,22 @@ onMounted(async () => {
 
 .header {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  padding-bottom: 5px;
+}
+
+.week-nav-btn {
+  font-size: 11px;
+  color: #ffffff;
+  background-color: #6c757d;
+  border-color: #5a6268;
+  padding: 2px 2px;
+  height: 10px;
+  line-height: normal;
+  width: 175px;
+  transition: background-color 0.3s ease;
 }
 
 .week-table {
@@ -235,23 +279,37 @@ td:hover {
 }
 
 .reserved {
-  background-color: #ff4d4f;
-  color: red;
+  background-color: #59a1db;
+  color: #004d40;
 }
 
 .booking-first-slot {
-  background-color: #ff4d4f;
-  color: white;
-  border-top: 2px solid black;
+  background-color: #59a1db;
+  color: #00332c;
+  border-top: 2px solid #113666;
 }
 
 .booking-continuation {
-  background-color: #ff4d4f;
-  color: white;
+  background-color: #59a1db;
+  color: #00332c;
   border: none;
+}
+
+.time-cell {
+  width: 75px;
 }
 
 .week-table td.reserved {
   border: none;
+}
+
+.nonReservable {
+  background-color: #d3d3d3;
+  /* Gris clair */
+  color: #a9a9a9;
+  /* Texte grisé */
+  pointer-events: none;
+  /* Désactive les clics */
+  cursor: not-allowed;
 }
 </style>
