@@ -295,6 +295,10 @@ td:hover {
   border: none;
 }
 
+.time-cell {
+  width: 75px;
+}
+
 .week-table td.reserved {
   border: none;
 }
