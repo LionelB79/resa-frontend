@@ -76,6 +76,7 @@
     <!-- Modals -->
     <CreateBookingModal
       v-if="
+        // On met selectedDayIndex !== null sinon le lundi n'est pas reservable (jour 0)
         showCreateBookingModal && selectedTimeSlot && selectedDayIndex !== null
       "
       :timeSlot="selectedTimeSlot"
