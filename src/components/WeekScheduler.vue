@@ -168,16 +168,14 @@ const isDayNonReservable = (dayIndex: number): boolean => {
   const currentDate = new Date(
     bookingStore.selectedWeek.getTime() + dayIndex * 24 * 60 * 60 * 1000
   );
-
-  const year = currentDate.getFullYear();
-  const formattedDate = currentDate.toISOString().split("T")[0];
-
-  const holidays = CONSTANT_FRENCH_HOLIDAYS(year);
+  // const year = currentDate.getFullYear();
+  // const formattedDate = currentDate.toISOString().split("T")[0];
+  // const holidays = CONSTANT_FRENCH_HOLIDAYS(year);
 
   const isWeekend = currentDate.getDay() === 6 || currentDate.getDay() === 0; // Samedi ou Dimanche
-  const isHoliday = holidays.includes(formattedDate);
-  console.log("holidays", holidays);
-  return isWeekend || isHoliday;
+
+  //  const isHoliday = holidays.includes(formattedDate);
+  return isWeekend;
 };
 
 // Observateur pour charger les réservations quand la salle change
