@@ -2,7 +2,11 @@
   <div class="week-scheduler">
     <!-- header + navigation entre semaines -->
     <div class="header">
-      <v-btn @click="bookingStore.goToPreviousWeek" outlined class="week-nav-btn">
+      <v-btn
+        @click="bookingStore.goToPreviousWeek"
+        outlined
+        class="week-nav-btn"
+      >
         ← Semaine précédente
       </v-btn>
       <span>{{ bookingStore.getFormattedWeekRange() }}</span>
@@ -25,23 +29,35 @@
 
       <!-- Corps du tableau avec les créneaux horaires -->
       <tbody>
-        <tr v-for="timeSlot in timeSlots" :key="timeSlot.hour + timeSlot.minutes">
+        <tr
+          v-for="timeSlot in timeSlots"
+          :key="timeSlot.hour + timeSlot.minutes"
+        >
           <td v-if="timeSlot.minutes === 0" class="time-cell" :rowspan="4">
             {{ timeSlot.hour }}:00
           </td>
-          <td v-for="dayIndex in 7" :key="dayIndex" :class="getSlotClass(dayIndex - 1, timeSlot)"
-            @click="handleSlotClick(dayIndex - 1, timeSlot)">
-            <div v-if="bookingStore.findBooking(dayIndex - 1, timeSlot)" :class="{
-              'booking-first-slot': bookingStore.isFirstSlotOfBooking(
-                dayIndex - 1,
-                timeSlot
-              ),
-              'booking-continuation': !bookingStore.isFirstSlotOfBooking(
-                dayIndex - 1,
-                timeSlot
-              ),
-            }">
-              <small v-if="bookingStore.isFirstSlotOfBooking(dayIndex - 1, timeSlot)">
+          <td
+            v-for="dayIndex in 7"
+            :key="dayIndex"
+            :class="getSlotClass(dayIndex - 1, timeSlot)"
+            @click="handleSlotClick(dayIndex - 1, timeSlot)"
+          >
+            <div
+              v-if="bookingStore.findBooking(dayIndex - 1, timeSlot)"
+              :class="{
+                'booking-first-slot': bookingStore.isFirstSlotOfBooking(
+                  dayIndex - 1,
+                  timeSlot
+                ),
+                'booking-continuation': !bookingStore.isFirstSlotOfBooking(
+                  dayIndex - 1,
+                  timeSlot
+                ),
+              }"
+            >
+              <small
+                v-if="bookingStore.isFirstSlotOfBooking(dayIndex - 1, timeSlot)"
+              >
                 {{
                   bookingStore.findBooking(dayIndex - 1, timeSlot)?.bookingTitle
                 }}
@@ -58,10 +74,17 @@
     </table>
 
     <!-- Modals -->
-    <CreateBookingModal v-if="showCreateBookingModal && selectedTimeSlot && selectedDayIndex"
-      :timeSlot="selectedTimeSlot" :dayIndex="selectedDayIndex" @close="showCreateBookingModal = false" />
-    <InfoBookingModal v-if="showInfoBookingModal && selectedBooking" :booking="selectedBooking"
-      @close="showInfoBookingModal = false" />
+    <CreateBookingModal
+      v-if="showCreateBookingModal && selectedTimeSlot && selectedDayIndex"
+      :timeSlot="selectedTimeSlot"
+      :dayIndex="selectedDayIndex"
+      @close="showCreateBookingModal = false"
+    />
+    <InfoBookingModal
+      v-if="showInfoBookingModal && selectedBooking"
+      :booking="selectedBooking"
+      @close="showInfoBookingModal = false"
+    />
     <!--Informations debug -->
     <div class="debug-info">
       <h3>Debug Information</h3>
@@ -179,12 +202,13 @@ onMounted(async () => {
 .week-nav-btn {
   font-size: 11px;
   color: #ffffff;
-  background-color: #3d86c5;
-  border-color: #1e4f7a;
+  background-color: #6c757d;
+  border-color: #5a6268;
   padding: 2px 2px;
   height: 10px;
   line-height: normal;
   width: 175px;
+  transition: background-color 0.3s ease;
 }
 
 .week-table {
@@ -231,19 +255,19 @@ td:hover {
 }
 
 .reserved {
-  background-color: #ff4d4f;
-  color: red;
+  background-color: #59a1db;
+  color: #004d40;
 }
 
 .booking-first-slot {
-  background-color: #ff4d4f;
-  color: white;
-  border-top: 2px solid black;
+  background-color: #59a1db;
+  color: #00332c;
+  border-top: 2px solid #113666;
 }
 
 .booking-continuation {
-  background-color: #ff4d4f;
-  color: white;
+  background-color: #59a1db;
+  color: #00332c;
   border: none;
 }
 
