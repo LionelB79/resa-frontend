@@ -14,6 +14,7 @@
       </div>
 
       <div class="modal-actions">
+        <button @click="deleteBooking" class="delete-btn">Supprimer</button>
         <button @click="$emit('close')">Fermer</button>
       </div>
     </div>
@@ -23,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps } from "vue";
+import { computed, defineProps, defineEmits } from "vue";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { formatInTimeZone } from "date-fns-tz";
@@ -32,6 +33,17 @@ import { CONSTANT_TIMEZONE_UTC } from "@/constants/constants";
 const props = defineProps<{
   booking: Booking;
 }>();
+const emit = defineEmits(["close"]);
+
+const bookingStore = useBookingStore();
+const deleteBooking = async () => {
+  try {
+    await bookingStore.deleteBooking(props.booking._id);
+    emit("close");
+  } catch (error) {
+    console.error("Erreur lors de la suppression de la réservation", error);
+  }
+};
 
 // Formate la date en français
 const formattedDate = computed(() => {
@@ -59,6 +71,7 @@ const formattedTime = computed(() => {
 <script lang="ts">
 import { defineComponent } from "vue";
 import { Booking } from "@/types/booking";
+import { useBookingStore } from "@/stores/bookingStore";
 
 export default defineComponent({
   name: "InfoBookingModal",
@@ -111,6 +124,11 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   margin-top: 20px;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  margin-right: 35px;
 }
 
 button {
