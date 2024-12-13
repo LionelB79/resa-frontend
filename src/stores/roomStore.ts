@@ -51,7 +51,6 @@ export const useRoomStore = defineStore("rooms", {
 
     filterRooms() {
       let filteredRooms = this.rooms;
-      console.log("Selected Equipment:", this.selectedEquipments);
       // Filtrage par équipement
       if (this.selectedEquipments.length > 0) {
         filteredRooms = filteredRooms.filter((room) =>
@@ -64,7 +63,6 @@ export const useRoomStore = defineStore("rooms", {
       filteredRooms = filteredRooms.filter(
         (room) => room.capacity >= this.selectedCapacity
       );
-      console.log("Selected Capacity:", this.selectedCapacity);
       //On vérifie si la liste de salle est vide apres filtrage
       this.noRoomsFound = filteredRooms.length === 0;
       this.filteredRooms = filteredRooms;
