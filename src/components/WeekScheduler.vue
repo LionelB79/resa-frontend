@@ -74,6 +74,7 @@
     </table>
 
     <!-- Modals -->
+    <!-- ref="CreateBookingModal" -->
     <CreateBookingModal
       v-if="
         // On met selectedDayIndex !== null sinon le lundi n'est pas reservable (jour 0)
@@ -88,24 +89,12 @@
       :booking="selectedBooking"
       @close="showInfoBookingModal = false"
     />
-    <!--Informations debug -->
-    <div class="debug-info">
-      <h3>Debug Information</h3>
-      <p>Selected Room: {{ roomStore.selectedRoom?._id }}</p>
-      <p>Semaine sélectionnée : {{ bookingStore.selectedWeek }}</p>
-      <p>Plage de semaine : {{ bookingStore.getFormattedWeekRange() }}</p>
-      <h4>Réservations :</h4>
-      <pre>{{ JSON.stringify(slots, null, 2) }}</pre>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
-import {
-  CONSTANT_DAYS_OF_WEEK,
-  CONSTANT_FRENCH_HOLIDAYS,
-} from "@/constants/constants";
+import { CONSTANT_DAYS_OF_WEEK } from "@/constants/constants";
 import { useRoomStore } from "@/stores/roomStore";
 import { useBookingStore } from "@/stores/bookingStore";
 import { Booking } from "@/types/booking";
@@ -114,8 +103,6 @@ import InfoBookingModal from "./modals/InfoBookingModal.vue";
 // semaine sélectionnée (reactive), on l'initialise avec les jours correspondant aux date avec startOfWeek
 const roomStore = useRoomStore();
 const bookingStore = useBookingStore();
-// ajout slots pour y attribuer les bookings récupérés pour la semaine
-const slots = ref<Booking[]>([]);
 
 // Créneaux horaires détaillés (de 8h à 18h avec séparation de 15 minutes)
 const timeSlots = Array.from({ length: (18 - 8) * 4 }, (_, i) => ({
