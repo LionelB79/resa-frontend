@@ -1,29 +1,14 @@
-# resa-frontend
+resa-frontend - Application de Réservation de Salles
+Instructions d'installation et de lancement
 
-## Project setup
-```
-npm install
-```
+Avant de lancer le frontend, le backend basé sur NestJS doit être configuré et en cours d'exécution.
+Consultez le README du backend pour les étapes d'installation et de configuration.
 
-### Compiles and hot-reloads for development
-```
+Installez les dépendances nécessaires avec :
+npm install --force
+
+Lancer le frontend
+Démarrez le serveur de développement frontend :
 npm run serve
-```
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your unit tests
-```
-npm run test:unit
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+L'application frontend sera accessible sur http://localhost:8080.

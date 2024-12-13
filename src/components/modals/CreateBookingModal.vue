@@ -8,16 +8,16 @@
         Créneau : {{ formattedStartTime }} - {{ formattedEndTime }}
       </p>
       <p v-if="isSlotExpired" class="text-red-500">
-        {{ ROOM_CONTROLS_MESSAGES.SLOT_EXPIRED }}
+        {{ ROOM_MODALS_MESSAGES.SLOT_EXPIRED }}
       </p>
       <p v-if="isOverlappingSlot" class="text-red-500">
-        {{ ROOM_CONTROLS_MESSAGES.SLOT_OVERLAPPING }} <br />
-        {{ ROOM_CONTROLS_MESSAGES.REDUCE_THE_DURATION }}
+        {{ ROOM_MODALS_MESSAGES.SLOT_OVERLAPPING }} <br />
+        {{ ROOM_MODALS_MESSAGES.REDUCE_THE_DURATION }}
       </p>
 
       <p v-if="isEndTimeAfter18h" class="text-red-500">
-        {{ ROOM_CONTROLS_MESSAGES.END_TIME_AFTER_18H }} <br />
-        {{ ROOM_CONTROLS_MESSAGES.REDUCE_THE_DURATION }}
+        {{ ROOM_MODALS_MESSAGES.END_TIME_AFTER_18H }} <br />
+        {{ ROOM_MODALS_MESSAGES.REDUCE_THE_DURATION }}
       </p>
       <div class="form-group">
         <label for="booking-title">Titre de la réservation</label>
@@ -30,13 +30,19 @@
       </div>
 
       <div class="form-group">
-        <label for="booking-email">Email de réservation</label>
+        <label for="booking-email"
+          >Email de réservation <span style="color: red">*</span>
+        </label>
+        <p v-if="!isFormValid && isEmailTouched" class="text-red-500">
+          {{ ROOM_MODALS_MESSAGES.INVALID_MAIL }}
+        </p>
         <input
           id="booking-email"
           v-model="userEmail"
           type="email"
           placeholder="Entrez votre email"
           required
+          @blur="markEmailAsTouched"
         />
       </div>
 
@@ -74,7 +80,7 @@ import { useBookingStore } from "@/stores/bookingStore";
 import { addDays, setHours, setMinutes, isPast } from "date-fns";
 import { fr } from "date-fns/locale";
 import { CONSTANT_DURATION_OPTIONS } from "@/constants/constants";
-import { ROOM_CONTROLS_MESSAGES } from "@/constants/messages";
+import { ROOM_MODALS_MESSAGES } from "@/constants/messages";
 import { format } from "date-fns-tz";
 const props = defineProps<{
   timeSlot: {
@@ -99,6 +105,11 @@ const isFormValid = computed(
     userEmail.value.trim() !== "" &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail.value)
 );
+
+const isEmailTouched = ref(false);
+const markEmailAsTouched = () => {
+  isEmailTouched.value = true;
+};
 
 // Vérifie si le slot est antérieur
 const isSlotExpired = computed(() => {

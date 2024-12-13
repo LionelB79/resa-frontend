@@ -14,10 +14,10 @@ export const API_ENDPOINTS = {
     GET_ALL: "/equipements",
   },
   BOOKINGS: {
-    //TODO endpoints a revoir
     GET_ROOM_BOOKINGS_FOR_WEEK: (roomId: string, weekStart: string) =>
       `/booking/room/${roomId}/week?weekStart=${weekStart}`,
 
     CREATE: "/booking",
+    DELETE: "/booking/cancel",
   },
 };
