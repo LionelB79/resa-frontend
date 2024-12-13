@@ -105,7 +105,6 @@ onMounted(() => {
 const onRoomChange = (event) => {
   const roomId = event.target.value;
   roomStore.selectRoom(roomId);
-  console.log("roomId", roomId);
 };
 
 // Gestion du changement de capacité

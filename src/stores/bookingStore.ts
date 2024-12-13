@@ -41,10 +41,8 @@ export const useBookingStore = defineStore("bookings", {
           format(this.selectedWeek, "yyyy-MM-dd")
         );
         const response = await apiClient.get(url);
-        console.log("Réservations récupérées depuis l'API : ", response.data);
         // On attribue les bookings au slots
         this.slots = response.data;
-        console.log("Réservations récupérées:", this.slots);
       } catch (error) {
         console.error("Erreur lors de la récupération des réservations", error);
         this.slots = [];
@@ -159,7 +157,6 @@ export const useBookingStore = defineStore("bookings", {
 
       // Vérification qu'une room est sélectionnée
       if (!roomStore.selectedRoom) {
-        console.error("Aucune salle sélectionnée");
         throw new Error("Aucune salle sélectionnée");
       }
 
@@ -193,9 +190,6 @@ export const useBookingStore = defineStore("bookings", {
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
       );
       // On envoie les données au backend
-      console.error("startDateParis", startDateUTC);
-      console.error("endDateParis", endDateUTC);
-
       try {
         const response = await apiClient.post(API_ENDPOINTS.BOOKINGS.CREATE, {
           userEmail: params.userEmail,
