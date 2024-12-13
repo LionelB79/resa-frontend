@@ -214,6 +214,26 @@ export const useBookingStore = defineStore("bookings", {
         throw error;
       }
     },
+    async deleteBooking(bookingId: string) {
+      try {
+        const roomStore = useRoomStore();
+        if (!roomStore.selectedRoom) {
+          console.error("Aucune salle sélectionnée");
+          throw new Error("Aucune salle sélectionnée");
+        }
+
+        const response = await apiClient.delete(
+          `${API_ENDPOINTS.BOOKINGS.DELETE}/${bookingId}`
+        );
+
+        await this.fetchBookings();
+
+        return response;
+      } catch (error) {
+        console.error("Erreur lors de la suppression de la réservation", error);
+        throw error;
+      }
+    },
   },
 
   getters: {
